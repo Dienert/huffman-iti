@@ -1,5 +1,9 @@
 package br.ufpb.iti;
 
+import java.util.Enumeration;
+
+import java.util.Hashtable;
+
 /**
  * 
  * @author Dienert<br/>
@@ -7,7 +11,7 @@ package br.ufpb.iti;
  *
  */
 public class ListaOrdenada {
-
+	
 	public No first = new No();
 	
 	/***
@@ -47,5 +51,15 @@ public class ListaOrdenada {
 				aux.setDir(novo);
 			}
 		}
+	}
+	
+	public void constroiLista(Hashtable<String, Integer> hash){
+		Enumeration<String> enumeration = hash.keys();
+		//Constroi a lista ordenada da HashTable
+		while(enumeration.hasMoreElements()) {
+			String charac = enumeration.nextElement();
+			this.insere(new No(charac.toString(), hash.get(charac)));
+		}
+		
 	}
 }

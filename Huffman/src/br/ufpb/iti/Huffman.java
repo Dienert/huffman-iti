@@ -67,56 +67,11 @@ public class Huffman {
 			}
 			
 			Enumeration<String> enumeration = hash.keys();
+			lista.constroiLista(hash); //Constroi a lista ordenada da HashTable
+			No raiz = No.constroiArvore(lista);
+			raiz.mostraArvore();
+				1
 			
-			//Constroi a lista ordenada da HashTable
-			while(enumeration.hasMoreElements()) {
-				String charac = enumeration.nextElement();
-				lista.insere(new No(charac.toString(), hash.get(charac)));
-				
-				No primeiro = lista.first;
-				No segundo, terceiro, raiz;
-				
-				//devo ter um no especial para que a raiz da arvore nao se perca
-				
-				segundo = primeiro.getDir();
-				segundo = primeiro.getDir();
-				terceiro = new No(null, primeiro.freq+ segundo.freq); 
-				terceiro.setDir(primeiro);
-				primeiro.ehEsq = false;
-				terceiro.setEsq(segundo);
-				primeiro.ehEsq = true;
-				raiz = terceiro;
-				
-				primeiro = terceiro;
-				segundo = segundo.getDir();
-				
-				//devo ter um no especial para que a raiz da arvore nao se perca
-				
-				//Constroi a Arvore a partir da Lista
-				while(segundo!=null){//acabou de percorrer a lista
-					
-					terceiro = new No(null, primeiro.freq+ segundo.freq); 
-					
-					/*nao tinha certeza se fazia diferenca ou nao inicializar esse No 
-					 *com um caractere ou com outro
-					 * (ele nao deixou eu  colocar apenas '' comoargumento do construtor
-					 */
-					
-					//o novo no criado tera como filhos os dois de menor frequencia disponiveis.
-					//um da lista e um da arvore (no primeiro caso, os dois da lista
-					terceiro.setDir(primeiro);
-					terceiro.setEsq(segundo);
-					
-					
-					//atualizando as referencias
-					primeiro = terceiro;
-					segundo = segundo.getDir();
-					
-				}  //acabou de percorrer a lista
-				
-				raiz.mostraArvore();
-				
-			}
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado");
 			System.exit(0);
@@ -132,5 +87,10 @@ public class Huffman {
 			hash.put(caracter, 1);
 		}
 	}
+	
+	
+
+	
+	
 	
 }
