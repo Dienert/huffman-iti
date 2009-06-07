@@ -9,6 +9,7 @@ public class No {
 	
 	No esq = null;
 	No dir = null;
+	No pai = null;
 
 	
 	public No(String caracter, int freq) {
@@ -40,6 +41,7 @@ public class No {
 
 	public void setEsq(No esq) {
 		this.esq = esq;
+		esq.setPai(this);
 	}
 
 	public No getDir() {
@@ -48,6 +50,15 @@ public class No {
 
 	public void setDir(No dir) {
 		this.dir = dir;
+		dir.setPai(this);
+	}
+	
+	public No getPai() {
+		return pai;
+	}
+
+	public void setPai(No Pai) {
+		this.pai = pai;
 	}
 	
 	public void mostraArvore(){
