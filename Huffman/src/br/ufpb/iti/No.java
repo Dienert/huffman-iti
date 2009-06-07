@@ -1,17 +1,17 @@
-package br.ufpb.iti.huffman;
+package br.ufpb.iti;
 
 
 public class No {
 
 	int freq = 0;
-	char caracter;
+	String caracter;
 	boolean ehEsq;
 	
 	No esq = null;
 	No dir = null;
 
 	
-	public No(char caracter, int freq) {
+	public No(String caracter, int freq) {
 		this.caracter = caracter;
 		this.freq = freq;
 	}
@@ -26,11 +26,11 @@ public class No {
 		this.freq = freq;
 	}
 
-	public char getCaracter() {
+	public String getCaracter() {
 		return caracter;
 	}
 
-	public void setCaracter(char caracter) {
+	public void setCaracter(String caracter) {
 		this.caracter = caracter;
 	}
 
