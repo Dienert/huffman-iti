@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-
-
 public class Huffman {
 
 	private static Hashtable<String, Integer> hash = new Hashtable<String, Integer>();
@@ -56,11 +54,14 @@ public class Huffman {
 						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)));
 					}
 				} else if (type.equals("-2b")) {
-					for (int i=0; i<nBytes; i=+2) {
+					for (int i=0; i<nBytes; i+=2) {
 						//Esta linha converte dois byte para 2 chars e depois para String
 						//e insere o caracter na hash de frenquencias
-						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)+
-														  (char)(assinatura[i+1] & 0xFF)));
+						updateHashTableFreq(new String(""+
+								(char)(assinatura[i] & 0xFF)+
+								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
+						//caso a linha i+1 seja igual ao numero de bytes litos, então
+						//o segundo caracter não existe, e será inserido apenas 1 caracter no hash
 					}
 				}
 			}
