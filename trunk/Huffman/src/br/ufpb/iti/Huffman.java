@@ -55,7 +55,7 @@ public class Huffman {
 					}
 				} else if (type.equals("-2b")) {
 					for (int i=0; i<nBytes; i+=2) {
-						//Esta linha converte dois byte para 2 chars e depois para String
+						//Esta linha converte dois bytes para 2 chars e depois para String
 						//e insere o caracter na hash de frenquencias
 						updateHashTableFreq(new String(""+
 								(char)(assinatura[i] & 0xFF)+
