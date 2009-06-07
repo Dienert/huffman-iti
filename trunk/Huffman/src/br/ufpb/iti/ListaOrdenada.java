@@ -1,8 +1,8 @@
-package br.ufpb.iti.huffman;
+package br.ufpb.iti;
 
 /**
  * 
- * @author Diénert<br/>
+ * @author Dienert<br/>
  * 		   Amanda
  *
  */
