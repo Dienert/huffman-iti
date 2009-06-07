@@ -5,7 +5,6 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class Huffman {
@@ -68,10 +67,13 @@ public class Huffman {
 				}
 			}
 			
-			Enumeration<String> enumeration = hashFrequencia.keys();
+
+			
 			lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
+
 			No raiz = No.constroiArvore(lista);
 			raiz.mostraArvore();
+
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado");
