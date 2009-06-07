@@ -1,9 +1,12 @@
 package br.ufpb.iti;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -15,6 +18,11 @@ public class Huffman {
 	
 	private static String absolutePath = "";
 	private static String type = "-1b";
+	
+	private static final String ONE_BYTE = "-1b";
+	private static final String TWO_BYTES = "-2b";
+	
+	private static String buffer = "";
 
 	public static void printSyntax() {
 		System.out.println("Usage: java Huffman file [options]");
@@ -34,7 +42,7 @@ public class Huffman {
 		if(size == 2)
 			type = args[1];
 		
-		if (fileName.equals("") || !(type.equals("-1b") || type.equals("-2b"))) {
+		if (fileName.equals("") || !(type.equals(ONE_BYTE) || type.equals(TWO_BYTES))) {
 			printSyntax();
 		}
 		
@@ -48,13 +56,13 @@ public class Huffman {
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 			while((nBytes = data.read(assinatura)) != -1) {
-				if(type.equals("-1b")) {
+				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						//Esta linha converte um byte para char e depois para String
 						//e insere o caracter na hash de frenquencias
 						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)));
 					}
-				} else if (type.equals("-2b")) {
+				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
 						//Esta linha converte dois bytes para 2 chars e depois para String
 						//e insere o caracter na hashtable de frenquencias
@@ -66,8 +74,6 @@ public class Huffman {
 					}
 				}
 			}
-			
-
 			
 			lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
 
@@ -100,11 +106,13 @@ public class Huffman {
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 			while((nBytes = data.read(assinatura)) != -1) {
-				if(type.equals("-1b")) {
+				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						No no = hashNos.get(new String(""+(char)(assinatura[i] & 0xFF)));
+						String code = getCode(no);
+						save(code);
 					}
-				} else if (type.equals("-2b")) {
+				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
 						//Esta linha converte dois bytes para 2 chars e depois para String
 						//e insere o caracter na hashtable de frenquencias
@@ -119,7 +127,7 @@ public class Huffman {
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
-			System.exit(1);
+			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -144,6 +152,42 @@ public class Huffman {
 		for (int i = 0, j = codeChars.length-1; i < codeChars.length; i++, j--)
 			newCode[j] = codeChars[i];
 		return new String(newCode);
+	}
+	
+	public static void save(String code) {
+		try {
+			FileOutputStream fWriter = new FileOutputStream(absolutePath);
+			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
+			DataOutputStream data = new DataOutputStream(buffWriter);
+			
+			if (type.equals(ONE_BYTE)) {
+				if (buffer.length() < 8) {
+					int size = buffer.length();
+					int codeSize = code.length();
+					//Se o espaço que falta no buffer é menor que o codigo passado
+					//a codigo eh quebrado e o restante eh colocado no buffer
+					if (8-size < codeSize) {
+						
+					}else {
+						
+					}
+				} 
+			}
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("Arquivo não encontrado");
+			System.exit(0);
+		}
+		
+	}
+	
+	public static String divideCode(String code, int size, String rest) {
+		char[] part = new char[size];
+		code.getChars(0, size, part, 0);
+		char[] restChars = new char[8-size];
+		code.getChars(size, code.length(), restChars, 0);
+		rest = new String(restChars);
+		return new String(part);
 	}
 	
 }
