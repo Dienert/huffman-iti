@@ -61,5 +61,53 @@ public class No {
 		this.getEsq().mostraArvore();
 		
 	}
+	
+	
+	public static No constroiArvore(ListaOrdenada lista){
+		No primeiro = lista.first;
+		No segundo, terceiro, raiz;
+		
+		//devo ter um no especial para que a raiz da arvore nao se perca
+		
+		segundo = primeiro.getDir();
+		segundo = primeiro.getDir();
+		terceiro = new No(null, primeiro.freq+ segundo.freq); 
+		terceiro.setDir(primeiro);
+		primeiro.ehEsq = false;
+		terceiro.setEsq(segundo);
+		primeiro.ehEsq = true;
+		raiz = terceiro;
+		
+		primeiro = terceiro;
+		segundo = segundo.getDir();
+		
+		//devo ter um no especial para que a raiz da arvore nao se perca
+		
+		//Constroi a Arvore a partir da Lista
+		while(segundo!=null){//acabou de percorrer a lista
+			
+			terceiro = new No(null, primeiro.freq+ segundo.freq); 
+			
+			/*nao tinha certeza se fazia diferenca ou nao inicializar esse No 
+			 *com um caractere ou com outro
+			 * (ele nao deixou eu  colocar apenas '' comoargumento do construtor
+			 */
+			
+			
+			
+			//AQUI, ELE DEVE FAZER UMA ESCOLHA ENTRE O PRÓXIMO NÓ DA LISTA OU O TERCEIRO QUE ACABA DE SER CRIADO
+			//o novo no criado tera como filhos os dois de menor frequencia disponiveis.
+			//um da lista e um da arvore (no primeiro caso, os dois da lista
+			terceiro.setDir(primeiro);
+			terceiro.setEsq(segundo);
+			
+			
+			//atualizando as referencias
+			primeiro = terceiro;
+			segundo = segundo.getDir();
+			
+		}  //acabou de percorrer a lista
+		return raiz;
+	}
 
 }
