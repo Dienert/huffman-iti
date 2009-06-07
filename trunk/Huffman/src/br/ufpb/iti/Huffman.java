@@ -79,7 +79,7 @@ public class Huffman {
 
 			No raiz = No.constroiArvore(lista);
 			raiz.mostraArvore();
-
+			codification();
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado");
@@ -161,17 +161,20 @@ public class Huffman {
 			DataOutputStream data = new DataOutputStream(buffWriter);
 			
 			if (type.equals(ONE_BYTE)) {
-				if (buffer.length() < 8) {
-					int size = buffer.length();
-					int codeSize = code.length();
-					//Se o espaço que falta no buffer é menor que o codigo passado
-					//a codigo eh quebrado e o restante eh colocado no buffer
-					if (8-size < codeSize) {
-						
-					}else {
-						
-					}
-				} 
+				int size = buffer.length();
+				int codeSize = code.length();
+				if (8-size < codeSize) {
+					//Se o espaço que falta no buffer é menor que o tamanho do codigo 
+					//passado, entao o codigo eh quebrado e o restante eh colocado no buffer
+					String[] result = divideCode(code, size);
+					buffer = result[1]; //coloca o restante no buffer
+					code = result[0];
+					size = buffer.length();
+					codeSize = code.length();
+				}
+				if (8-size <= codeSize) {
+					//salva
+				}
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -181,13 +184,13 @@ public class Huffman {
 		
 	}
 	
-	public static String divideCode(String code, int size, String rest) {
+	public static String[] divideCode(String code, int size) {
 		char[] part = new char[size];
 		code.getChars(0, size, part, 0);
 		char[] restChars = new char[8-size];
 		code.getChars(size, code.length(), restChars, 0);
-		rest = new String(restChars);
-		return new String(part);
+		String[] result = {new String(part), new String(restChars)};
+		return result;
 	}
 	
 }
