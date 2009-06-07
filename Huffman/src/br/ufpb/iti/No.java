@@ -57,7 +57,7 @@ public class No {
 		return pai;
 	}
 
-	public void setPai(No Pai) {
+	public void setPai(No pai) {
 		this.pai = pai;
 	}
 	
