@@ -91,7 +91,7 @@ public class Huffman {
 	
 	public static void codification() {
 		try {
-			FileInputStream fReader = fReader = new FileInputStream(absolutePath);
+			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 			DataInputStream data = new DataInputStream(buffReader);  
 			
@@ -118,16 +118,11 @@ public class Huffman {
 			}
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("Arquivo não encontrado");
+			System.exit(1);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	
-
-	
-	
 	
 }
