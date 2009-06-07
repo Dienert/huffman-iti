@@ -102,9 +102,7 @@ public class Huffman {
 			while((nBytes = data.read(assinatura)) != -1) {
 				if(type.equals("-1b")) {
 					for (int i=0; i<nBytes; i++) {
-						//Esta linha converte um byte para char e depois para String
-						//e insere o caracter na hash de frenquencias
-						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)));
+						No no = hashNos.get(new String(""+(char)(assinatura[i] & 0xFF)));
 					}
 				} else if (type.equals("-2b")) {
 					for (int i=0; i<nBytes; i+=2) {
@@ -125,6 +123,27 @@ public class Huffman {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getCode(No no) {
+		No aux = no;
+		String codigo = "";
+		while(aux.getPai() != null) {
+			if (aux.ehEsq)
+				codigo = codigo+"0";
+			else
+				codigo = codigo+"1";
+			aux = aux.getPai();
+		}
+		return invertCode(codigo);
+	}
+	
+	public static String invertCode(String code) {
+		char[] codeChars = code.toCharArray();
+		char[] newCode = code.toCharArray();
+		for (int i = 0, j = codeChars.length-1; i < codeChars.length; i++, j--)
+			newCode[j] = codeChars[i];
+		return new String(newCode);
 	}
 	
 }
