@@ -78,17 +78,17 @@ public class Huffman {
 			lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
 
 			No raiz = No.constroiArvore(lista);
-<<<<<<< .mine
+
 			if(raiz != null){
 				No.mostraArvore(raiz);
 			}
 			else{
 				System.out.println("raiz não existe");
 			}
-=======
-			raiz.mostraArvore();
+
+
 			codification();
->>>>>>> .r20
+
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado");
