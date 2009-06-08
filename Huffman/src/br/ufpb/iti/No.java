@@ -1,5 +1,7 @@
 package br.ufpb.iti;
 
+import java.util.Scanner;
+
 
 public class No {
 
@@ -34,6 +36,7 @@ public class No {
 	public void setCaracter(String caracter) {
 		this.caracter = caracter;
 	}
+	
 
 	public No getEsq() {
 		return esq;
@@ -45,6 +48,7 @@ public class No {
 	}
 
 	public No getDir() {
+		
 		return dir;
 	}
 
@@ -61,16 +65,30 @@ public class No {
 		this.pai = pai;
 	}
 	
-	public void mostraArvore(){
+	public static void mostraArvore(No raiz){
 		
-		if(this.equals(null)){
+		if(raiz == null){
+			System.out.println("-");
 			return;
 		}
+		else{
+		System.out.println(raiz.freq);
 		
-		System.out.println(this.freq);
-		this.getDir().mostraArvore();
-		this.getEsq().mostraArvore();
 		
+		/*não pode fazer isso pois o direito está nulo
+		* modificar método mostraArvore para esse caso.
+		* ou o construtor do No... ao invés de não criar (deixar nulo)
+		* é melhor criar umcom frequência zero?
+		*/
+			if(raiz.getDir()!=null){
+				mostraArvore(raiz.getDir());
+			}
+			Scanner scan = new Scanner(System.in);
+			scan.nextInt();
+			if(raiz.getEsq()!= null){
+				mostraArvore(raiz.getEsq());
+			}
+		}
 	}
 	
 	
