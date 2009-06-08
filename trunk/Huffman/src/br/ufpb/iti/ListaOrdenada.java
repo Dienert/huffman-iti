@@ -33,7 +33,7 @@ public class ListaOrdenada {
 				if (aux.getFreq() > novo.getFreq())
 					break;
 				else 
-					aux = aux.dir; 
+					aux = aux.getDir(); 
 			}
 			//inserir antes de aux
 			if(aux.getFreq() > novo.getFreq()) { 

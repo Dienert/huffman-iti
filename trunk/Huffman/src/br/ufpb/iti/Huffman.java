@@ -76,7 +76,9 @@ public class Huffman {
 			}
 			
 			lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
-
+		
+			
+			
 			No raiz = No.constroiArvore(lista);
 
 			if(raiz != null){
@@ -146,7 +148,7 @@ public class Huffman {
 		No aux = no;
 		String codigo = "";
 		while(aux.getPai() != null) {
-			if (aux.ehEsq)
+			if (aux.getEhEsq())
 				codigo = codigo+"0";
 			else
 				codigo = codigo+"1";
