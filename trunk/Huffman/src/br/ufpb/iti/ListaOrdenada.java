@@ -12,7 +12,7 @@ import java.util.Hashtable;
  */
 public class ListaOrdenada {
 	
-	public No first = new No();
+	private No first = null;
 	
 	/***
 	 * 
@@ -24,9 +24,8 @@ public class ListaOrdenada {
 	 ***/
 	public void insere(No novo) {
 		//Nao possui nenhum caracter ainda (lista vazia)
-		if (first.getFreq() == 0) {
-			first.setCaracter(novo.getCaracter());
-			first.setFreq(novo.getFreq());
+		if (first == null) {
+			first = novo;
 		} else {
 			No aux = first;
 			while (aux.getDir() != null) {
@@ -53,6 +52,15 @@ public class ListaOrdenada {
 		}
 	}
 	
+	public No removeFirst() {
+		No aux = first;
+		first = first.getDir();
+		if (first != null)
+			first.setEsq(null);
+		aux.setDir(null);
+		return aux; 
+	}
+	
 	public void constroiLista(Hashtable<String, Integer> hash){
 		Enumeration<String> enumeration = hash.keys();
 		//Constroi a lista ordenada da HashTable
@@ -62,4 +70,13 @@ public class ListaOrdenada {
 		}
 		
 	}
+
+	public No getFirst() {
+		return first;
+	}
+
+	public void setFirst(No first) {
+		this.first = first;
+	}
+	
 }
