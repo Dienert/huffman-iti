@@ -1,18 +1,18 @@
 package br.ufpb.iti;
 
-import java.util.Scanner;
 
 
 public class No {
 
 	private int freq = 0;
-	String caracter;
+	private String caracter;
 	private boolean ehEsq;
 	
 	private No esq = null;
 	private No dir = null;
 	private No pai = null;
-
+	private No filhoEsq = null;
+	private No filhoDir = null;
 	
 	public No(String caracter, int freq) {
 		this.caracter = caracter;
@@ -52,7 +52,8 @@ public class No {
 
 	public void setEsq(No esq) {
 		this.esq = esq;
-		esq.setPai(this);
+		if (esq != null)
+			esq.setPai(this);
 	}
 
 	public No getDir() {
@@ -62,7 +63,8 @@ public class No {
 
 	public void setDir(No dir) {
 		this.dir = dir;
-		dir.setPai(this);
+		if(dir != null)
+			dir.setPai(this);
 	}
 	
 	public No getPai() {
@@ -73,6 +75,22 @@ public class No {
 		this.pai = pai;
 	}
 	
+	public No getFilhoEsq() {
+		return filhoEsq;
+	}
+
+	public void setFilhoEsq(No filhoEsq) {
+		this.filhoEsq = filhoEsq;
+	}
+
+	public No getFilhoDir() {
+		return filhoDir;
+	}
+
+	public void setFilhoDir(No filhoDir) {
+		this.filhoDir = filhoDir;
+	}
+
 	public static void mostraArvore(No raiz){
 		
 		if(raiz == null){
@@ -88,101 +106,27 @@ public class No {
 		* ou o construtor do No... ao invés de não criar (deixar nulo)
 		* é melhor criar umcom frequência zero?
 		*/
-			if(raiz.getDir()!=null){
-				mostraArvore(raiz.getDir());
+			if(raiz.getFilhoDir()!=null){
+				mostraArvore(raiz.getFilhoDir());
 			}
 			/*Scanner scan = new Scanner(System.in);
 			scan.nextInt();*/
-			if(raiz.getEsq()!= null){
-				mostraArvore(raiz.getEsq());
+			if(raiz.getFilhoEsq()!= null){
+				mostraArvore(raiz.getFilhoEsq());
 			}
 		}
 	}
 	
-	
 	public static No constroiArvore(ListaOrdenada lista){
-		No primeiro;
-		No segundo, terceiro;
-		
-		
-		do{
-			
-		primeiro = lista.first;
-		segundo = primeiro.getDir();
-		
-		terceiro = new No(null, primeiro.freq+ segundo.freq); 
-		terceiro.setDir(primeiro);
-		primeiro.setEhEsq(false);
-		terceiro.setEsq(segundo);
-		primeiro.setEhEsq(true);
-		lista.insere(terceiro);
-		} while(segundo.getDir()!= null); //acabpou de adicionar um segundo que não tem segundo :P
-		//primeiro = segundo.getDir();
-		//segundo = primeiro.getDir();
-		
-		
-		
-		/*//devo ter um no especial para que a raiz da arvore nao se perca
-		
-		segundo = primeiro.getDir();
-		terceiro = new No(null, primeiro.freq+ segundo.freq); 
-		terceiro.setDir(primeiro);
-		primeiro.ehEsq = false;
-		terceiro.setEsq(segundo);
-		primeiro.ehEsq = true;
-		
-		primeiro = segundo.getDir();
-		segundo = primeiro.getDir();
-		//nem sempre verdadeiro o que vem a seguir! mudar isso:
-		
-		//quarto será sempre usado para evitar confusão com referências
-
-		//Esses testes serão feitos a cada vez
-		
-		
-		//devo ter um no especial para que a raiz da arvore nao se perca
-		
-		//Constroi a Arvore a partir da Lista
-		
-		
-		//antes de entrar no while, existem 3 nós (primeiro, 
-		while(segundo!=null){//acabou de percorrer a lista
-			
-			if(((primeiro!= null) && (terceiro.freq <= primeiro.freq)) ||((segundo!= null) && terceiro.freq<segundo.freq)){
-				//duas únicas condições em que o terceiro será usado.
-				//unirá o nó recentemente criado ao próximo da lista
-				raiz = new No(null, primeiro.freq+ terceiro.freq);
-				raiz.setDir(terceiro);
-				terceiro.setEhEsq(false);
-				raiz.setEsq(primeiro);
-				primeiro.setEhEsq(true);
-				terceiro = raiz;
-				primeiro = segundo;
-				
-			}
-			
-			else{ //terceiro > primeiro
-				//unirá os dois próximos da lista
-				if((primeiro!=null) && (segundo!= null)){ //deixa o if????
-					raiz = new No(null, primeiro.getFreq() + segundo.getFreq());
-					raiz.setDir(primeiro);
-					primeiro.setEhEsq(false);
-					raiz.setEsq(segundo);
-					segundo.setEhEsq(true);
-					primeiro = raiz;
-				}
-			}
-			
-			
-			//atualizações de referência devem ser feitas caso a caso
-			
-			segundo = primeiro.getDir();
-			
-		}  //acabou de percorrer a lista
-*/		
-		return terceiro;
+		while (lista.getFirst().getDir() != null) {
+			No primeiro = lista.removeFirst();
+			No segundo = lista.removeFirst();
+			No novo = new No(null, primeiro.getFreq()+ segundo.getFreq());
+			novo.setFilhoEsq(primeiro);
+			novo.setFilhoDir(segundo);
+			lista.insere(novo);
+		}
+		return lista.getFirst();
 	}
-	
-	
 
 }
