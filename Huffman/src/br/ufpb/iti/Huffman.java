@@ -132,6 +132,13 @@ public class Huffman {
 		}
 	}
 	
+	/**
+	 * 
+	 * Codifica a mensagem com base na hashtable que contem os códigos de cada 
+	 * símbolo. Automaticamente o método faz a diferenciação entre os dois tipos
+	 * de codificação: usando 1 byte ou 2 bytes.
+	 * 
+	 */
 	public static void codification() {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
