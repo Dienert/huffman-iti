@@ -98,14 +98,14 @@ public class No {
 			return;
 		}
 		else{
-		System.out.println(raiz.freq);
-		
-		
-		/*não pode fazer isso pois o direito está nulo
-		* modificar método mostraArvore para esse caso.
-		* ou o construtor do No... ao invés de não criar (deixar nulo)
-		* é melhor criar umcom frequência zero?
-		*/
+			System.out.println(raiz.freq);
+			
+			
+			/*não pode fazer isso pois o direito está nulo
+			* modificar método mostraArvore para esse caso.
+			* ou o construtor do No... ao invés de não criar (deixar nulo)
+			* é melhor criar umcom frequência zero?
+			*/
 			if(raiz.getFilhoDir()!=null){
 				mostraArvore(raiz.getFilhoDir());
 			}
@@ -117,6 +117,14 @@ public class No {
 		}
 	}
 	
+	/**
+	 * 
+	 * Constroi a arvore de Huffman, somando os dois primeiros elementos da lista
+	 * ordenada e removendo-os da lista, até que sobre apenas o nó raiz
+	 * @param lista Lista ordenada contendo os nós dos símbolos e suas frenquencias
+	 * @return Retorna o nó raiz da árvore
+	 * 
+	 */
 	public static No constroiArvore(ListaOrdenada lista){
 		while (lista.getFirst().getDir() != null) {
 			No primeiro = lista.removeFirst();

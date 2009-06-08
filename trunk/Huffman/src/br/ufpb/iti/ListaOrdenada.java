@@ -52,6 +52,13 @@ public class ListaOrdenada {
 		}
 	}
 	
+	/**
+	 * 
+	 * Retorna o primeiro nós da lista encadeada ao mesmo tempo em que este é removido
+	 * da lista.
+	 * @return Nó removido da lista
+	 * 
+	 */
 	public No removeFirst() {
 		No aux = first;
 		first = first.getDir();
@@ -61,6 +68,13 @@ public class ListaOrdenada {
 		return aux; 
 	}
 	
+	/**
+	 * 
+	 * Constrói uma lista duplamente encadeada ordenada pelo número da frequencia
+	 * de cada símbolo existente na hashtable
+	 * @param hash Hashtable contendo os símbolos e suas respectivas frequencias
+	 * 
+	 */
 	public void constroiLista(Hashtable<String, Integer> hash){
 		Enumeration<String> enumeration = hash.keys();
 		//Constroi a lista ordenada da HashTable
