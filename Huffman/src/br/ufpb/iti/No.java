@@ -5,13 +5,13 @@ import java.util.Scanner;
 
 public class No {
 
-	int freq = 0;
+	private int freq = 0;
 	String caracter;
-	boolean ehEsq;
+	private boolean ehEsq;
 	
-	No esq = null;
-	No dir = null;
-	No pai = null;
+	private No esq = null;
+	private No dir = null;
+	private No pai = null;
 
 	
 	public No(String caracter, int freq) {
@@ -37,7 +37,15 @@ public class No {
 		this.caracter = caracter;
 	}
 	
+	
+	public boolean getEhEsq() {
+		return ehEsq;
+	}
 
+	public void setEhEsq(boolean v) {
+		this.ehEsq = v;
+	}
+	
 	public No getEsq() {
 		return esq;
 	}
@@ -83,8 +91,8 @@ public class No {
 			if(raiz.getDir()!=null){
 				mostraArvore(raiz.getDir());
 			}
-			Scanner scan = new Scanner(System.in);
-			scan.nextInt();
+			/*Scanner scan = new Scanner(System.in);
+			scan.nextInt();*/
 			if(raiz.getEsq()!= null){
 				mostraArvore(raiz.getEsq());
 			}
@@ -93,12 +101,28 @@ public class No {
 	
 	
 	public static No constroiArvore(ListaOrdenada lista){
-		No primeiro = lista.first;
+		No primeiro;
 		No segundo, terceiro;
-		No raiz = null;
 		
 		
-		//devo ter um no especial para que a raiz da arvore nao se perca
+		do{
+			
+		primeiro = lista.first;
+		segundo = primeiro.getDir();
+		
+		terceiro = new No(null, primeiro.freq+ segundo.freq); 
+		terceiro.setDir(primeiro);
+		primeiro.setEhEsq(false);
+		terceiro.setEsq(segundo);
+		primeiro.setEhEsq(true);
+		lista.insere(terceiro);
+		} while(segundo.getDir()!= null); //acabpou de adicionar um segundo que não tem segundo :P
+		//primeiro = segundo.getDir();
+		//segundo = primeiro.getDir();
+		
+		
+		
+		/*//devo ter um no especial para que a raiz da arvore nao se perca
 		
 		segundo = primeiro.getDir();
 		terceiro = new No(null, primeiro.freq+ segundo.freq); 
@@ -129,9 +153,9 @@ public class No {
 				//unirá o nó recentemente criado ao próximo da lista
 				raiz = new No(null, primeiro.freq+ terceiro.freq);
 				raiz.setDir(terceiro);
-				terceiro.ehEsq = false;
+				terceiro.setEhEsq(false);
 				raiz.setEsq(primeiro);
-				primeiro.ehEsq = true;
+				primeiro.setEhEsq(true);
 				terceiro = raiz;
 				primeiro = segundo;
 				
@@ -140,11 +164,11 @@ public class No {
 			else{ //terceiro > primeiro
 				//unirá os dois próximos da lista
 				if((primeiro!=null) && (segundo!= null)){ //deixa o if????
-					raiz = new No(null, primeiro.freq + segundo.freq);
+					raiz = new No(null, primeiro.getFreq() + segundo.getFreq());
 					raiz.setDir(primeiro);
-					primeiro.ehEsq = false;
+					primeiro.setEhEsq(false);
 					raiz.setEsq(segundo);
-					segundo.ehEsq = true;
+					segundo.setEhEsq(true);
 					primeiro = raiz;
 				}
 			}
@@ -155,8 +179,8 @@ public class No {
 			segundo = primeiro.getDir();
 			
 		}  //acabou de percorrer a lista
-		
-		return raiz;
+*/		
+		return terceiro;
 	}
 	
 	
