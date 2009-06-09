@@ -1,14 +1,11 @@
 package br.ufpb.iti;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
@@ -100,14 +97,14 @@ public class Huffman {
 //			else System.out.println("raiz não existe");
 			
 			//Gera um hash de simbolos e seus codigos
-			hashCodes = generateHashSimbolsAndCodes(raiz, "");
+			generateHashSimbolsAndCodes(raiz, "");
 			
 			System.out.println(hashFrequencia);
 			System.out.println(hashCodes);
 			
 			//Inicia codificacao da mensagem
 			int freeBist = codification();
-			putHeader(freeBist, absolutePathResult);
+			putHeader(numeroDeSimbolosUsados, freeBist, hashFrequencia, absolutePathResult);
 			currentTime();
 			
 		} catch (FileNotFoundException e) {
@@ -139,16 +136,14 @@ public class Huffman {
 	 * @param code Código inicial da raiz que será usado recursivamente
 	 * 
 	 */
-	public static Hashtable<String, String> generateHashSimbolsAndCodes(No raiz, String code) {
-		Hashtable<String, String> hash = new Hashtable<String, String>();
+	public static void generateHashSimbolsAndCodes(No raiz, String code) {
 		if (raiz != null) {
-			hashCodes = generateHashSimbolsAndCodes(raiz.getFilhoEsq(), code+"0");
-			hashCodes = generateHashSimbolsAndCodes(raiz.getFilhoDir(), code+"1");
+			generateHashSimbolsAndCodes(raiz.getFilhoEsq(), code+"0");
+			generateHashSimbolsAndCodes(raiz.getFilhoDir(), code+"1");
 			if (raiz.getFilhoEsq() == null && raiz.getFilhoDir() == null) {
 				hashCodes.put(raiz.getCaracter(), code);
 			}
 		}
-		return hash;
 	}
 	
 	/**
@@ -242,7 +237,7 @@ public class Huffman {
 //		return new String(newCode);
 //	}
 	
-	public static void putHeader(int freeBits, String absolutePath) {
+	public static void putHeader(int bitsUsados, int freeBits, Hashtable<String, Integer> hash, String absolutePath) {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
@@ -250,7 +245,11 @@ public class Huffman {
 			
 			FileWriter fWriter = new FileWriter(absolutePath+".tmp");
 			BufferedWriter out = new BufferedWriter(fWriter);
+			
+			out.write(bitsUsados);
 			out.write(freeBits);
+			
+			
 			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
