@@ -62,12 +62,14 @@ public class Huffman {
 			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
+			int lidos = 0;
 			while((nBytes = data.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						//Esta linha converte um byte para char e depois para String
 						//e insere o caracter na hash de frenquencias
 						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)));
+						lidos++;
 					}
 				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
@@ -77,8 +79,10 @@ public class Huffman {
 								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
 						//caso a linha i+1 seja igual ao numero de bytes lidos, entao
 						//o segundo caracter nao existe, e serah inserido apenas 1 caracter na hashtable
+						lidos++;
 					}
 				}
+				
 			}
 			
 			lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
@@ -324,6 +328,15 @@ public class Huffman {
 		code.getChars(size, code.length(), restChars, 0);
 		String[] result = {new String(part), new String(restChars)};
 		return result;
+	}
+	
+	public static float calculaEntropia(ListaOrdenada lista, int lidos){
+		No aux = lista.getFirst();
+		float entropia = 0.0f;
+		for(; aux!=null; aux = aux.getDir()){
+			entropia += ((aux.getFreq()/lidos) * (Math.log(1/aux.getFreq())));
+		}
+		return entropia;
 	}
 	
 }
