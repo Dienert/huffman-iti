@@ -164,7 +164,7 @@ public class Huffman {
 			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
-			String[] result;
+			String[] result = {"", ""};
 			int freeBitsInLastByte = 0;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
@@ -190,11 +190,13 @@ public class Huffman {
 				}
 			}
 			
-			if (freeBitsInLastByte > 7 || freeBitsInLastByte < 1) {
-				System.out.println("Número inválido de bits livres no último byte");
+			if (freeBitsInLastByte > 7 || freeBitsInLastByte < 0) {
+				System.out.println("\nNúmero inválido de bits livres no último byte");
+				System.out.println(result[1]);
+				System.out.println("buffer: "+buffer);
 				System.exit(0);
 			}
-			System.out.println("Número de bits livres do último byte: "+freeBitsInLastByte);
+			System.out.println("\nNúmero de bits livres do último byte: "+freeBitsInLastByte);
 			putHeader(freeBitsInLastByte);
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
@@ -267,7 +269,7 @@ public class Huffman {
 		int bufferSize = buffer.length();
 		int codeSize = code.length();
 		int freeSpace = 8-bufferSize;
-		String[] result = {buffer, null};
+		String[] result = {buffer, "0"};
 		
 		try {
 			if (freeSpace < codeSize) {
@@ -286,7 +288,9 @@ public class Huffman {
 			} else if (freeSpace >= codeSize) {
 				buffer = buffer+code;
 				if (buffer.length() == 8) {
-					System.out.print(buffer);
+					if(isLastByte)
+						System.out.print("\nultimo codigo salvo: "+buffer);
+					else System.out.print(buffer+"|");
 					data.writeByte(getByte(buffer));
 					buffer = "";
 				} else if (buffer.length() < 8 && isLastByte) {
