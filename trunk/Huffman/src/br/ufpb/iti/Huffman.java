@@ -2,11 +2,14 @@ package br.ufpb.iti;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Hashtable;
@@ -41,13 +44,13 @@ public class Huffman {
 	
 	public static void main(String[] args) {
 		
-		int size = args.length;
+		int sizeParams = args.length;
 		String fileName = "";
 		
 		currentTime();
-		if (size >= 1)
+		if (sizeParams >= 1)
 			fileName = args[0];
-		if(size == 2)
+		if(sizeParams == 2)
 			type = args[1];
 		
 		if (fileName.equals("") || !(type.equals(ONE_BYTE) || type.equals(TWO_BYTES))) {
@@ -86,8 +89,10 @@ public class Huffman {
 				
 			}
 			
-			lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
+			int numeroDeSimbolosUsados = lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
 		
+			System.out.println("Numero de símbolos usados: "+numeroDeSimbolosUsados);
+			
 			No raiz = No.constroiArvore(lista);
 			
 //			if(raiz != null)
@@ -97,8 +102,12 @@ public class Huffman {
 			//Gera um hash de simbolos e seus codigos
 			generateHashSimbolsAndCodes(raiz, "");
 			
+			System.out.println(hashFrequencia);
+			System.out.println(hashCodes);
+			
 			//Inicia codificacao da mensagem
-			codification();
+			int freeBist = codification();
+			putHeader(freeBist, absolutePathResult);
 			currentTime();
 			
 		} catch (FileNotFoundException e) {
@@ -123,10 +132,12 @@ public class Huffman {
 	}
 	
 	/**
+	 * 
 	 * Gera um hash contendo os símbolos e o seu código binário, onde o símbolo é
 	 * a chave do hash para seu respectivo código
 	 * @param raiz Raiz da árvore de Huffman
 	 * @param code Código inicial da raiz que será usado recursivamente
+	 * 
 	 */
 	public static void generateHashSimbolsAndCodes(No raiz, String code) {
 		if (raiz != null) {
@@ -145,7 +156,8 @@ public class Huffman {
 	 * de codificação: usando 1 byte ou 2 bytes.
 	 * 
 	 */
-	public static void codification() {
+	public static int codification() {
+		int freeBitsInLastByte = 0;
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
@@ -158,20 +170,19 @@ public class Huffman {
 				absolutePathResult = "/tmp/teste.adh";
 			}
 			
-			FileOutputStream fWriter = new FileOutputStream(absolutePathResult);
-			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
-			DataOutputStream dataOut = new DataOutputStream(buffWriter);
+			FileWriter fWriter = new FileWriter(absolutePath+".tmp");
+			BufferedWriter out = new BufferedWriter(fWriter);
 			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 			String[] result = {"", ""};
-			int freeBitsInLastByte = 0;
+
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
 						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
-						result = save(code, buffer, dataOut, isLastByte);
+						result = save(code, buffer, out, isLastByte);
 						buffer = result[0]; //Atualizando o buffer
 						if (isLastByte && result[1] != null)
 							freeBitsInLastByte = Integer.parseInt(result[1]);
@@ -182,7 +193,7 @@ public class Huffman {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
 								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
 						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
-						result = save(code, buffer, dataOut, isLastByte);
+						result = save(code, buffer, out, isLastByte);
 						buffer = result[0]; //Atualizando o buffer
 						if (isLastByte && result[1] != null)
 							freeBitsInLastByte = Integer.parseInt(result[1]);
@@ -197,13 +208,13 @@ public class Huffman {
 				System.exit(0);
 			}
 			System.out.println("\nNúmero de bits livres do último byte: "+freeBitsInLastByte);
-			putHeader(freeBitsInLastByte);
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
 			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return freeBitsInLastByte;
 	}
 	
 //	public static String getCode(No no) {
@@ -227,25 +238,30 @@ public class Huffman {
 //		return new String(newCode);
 //	}
 	
-	public static void putHeader(int freeBits) {
+	public static void putHeader(int freeBits, String absolutePath) {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 			DataInputStream dataIn = new DataInputStream(buffReader);  
 			
-			FileOutputStream fWriter = new FileOutputStream(absolutePath+".tmp");
-			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
-			DataOutputStream dataOut = new DataOutputStream(buffWriter);
-
-			dataOut.writeByte(freeBits);
+			FileWriter fWriter = new FileWriter(absolutePath+".tmp");
+			BufferedWriter out = new BufferedWriter(fWriter);
+			out.write(freeBits);
 			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				for (int i=0; i<nBytes; i++) {
-					dataOut.writeByte(assinatura[i]);
+					out.write(assinatura[i]);
 				}
 			}			
+			out.close();
+			
+			File fileIn = new File(absolutePath);
+			fileIn.delete();
+			File fileOut = new File(absolutePath+".tmp");
+			fileOut.renameTo(fileIn);
+			fileOut.delete();
 		} catch (FileNotFoundException e) {
 			System.exit(0);
 			e.printStackTrace();
@@ -264,7 +280,7 @@ public class Huffman {
 	 * no útlimo byte, caso isLastByte seja igual a false, então este elemento 
 	 * é igual a <i>null</i> 
 	 */
-	public static String[] save(String code, String buffer, DataOutputStream data, boolean isLastByte) {
+	public static String[] save(String code, String buffer, BufferedWriter out, boolean isLastByte) {
 		
 		int bufferSize = buffer.length();
 		int codeSize = code.length();
@@ -279,10 +295,10 @@ public class Huffman {
 				buffer = buffer+divided[0];
 				//Neste save o codigo a ser salvo deve ter exatamente 8 bits
 				//para ser salvo, o buffer eh zerado
-				save(buffer, "", data, isLastByte);
+				save(buffer, "", out, isLastByte);
 				buffer = divided[1]; //coloca o restante no buffer
 				if (buffer.length() >= 8) {
-					result = save(buffer, "", data, isLastByte);
+					result = save(buffer, "", out, isLastByte);
 					return result;
 				}
 			} else if (freeSpace >= codeSize) {
@@ -291,11 +307,11 @@ public class Huffman {
 					if(isLastByte)
 						System.out.print("\nultimo codigo salvo: "+buffer);
 					else System.out.print(buffer+"|");
-					data.writeByte(getByte(buffer));
+					out.write(getByte(buffer));
 					buffer = "";
 				} else if (buffer.length() < 8 && isLastByte) {
 					System.out.println("\nultimo codigo salvo: "+buffer);
-					data.writeByte(getByte(buffer));
+					out.write(getByte(buffer));
 					if (buffer.equals(""))
 						result[1] = "0";
 					else result[1] = (8-buffer.length())+"";
