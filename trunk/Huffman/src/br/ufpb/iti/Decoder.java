@@ -190,7 +190,7 @@ public class Decoder {
 			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
 			DataOutputStream dataOut = new DataOutputStream(buffWriter);
 
-				
+			dataOut.writeBytes(abc);	
 			
 				
 		} catch (FileNotFoundException e) {
