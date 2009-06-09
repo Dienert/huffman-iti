@@ -170,7 +170,7 @@ public class Huffman {
 				absolutePathResult = "/tmp/teste.adh";
 			}
 			
-			FileWriter fWriter = new FileWriter(absolutePath+".tmp");
+			FileWriter fWriter = new FileWriter(absolutePathResult);
 			BufferedWriter out = new BufferedWriter(fWriter);
 			
 			byte[] assinatura = new byte[1024];  
@@ -201,13 +201,15 @@ public class Huffman {
 				}
 			}
 			
+			out.close();
+			
 			if (freeBitsInLastByte > 7 || freeBitsInLastByte < 0) {
 				System.out.println("\nNúmero inválido de bits livres no último byte");
 				System.out.println(result[1]);
 				System.out.println("buffer: "+buffer);
 				System.exit(0);
 			}
-			System.out.println("\nNúmero de bits livres do último byte: "+freeBitsInLastByte);
+			System.out.println("Número de bits livres do último byte: "+freeBitsInLastByte);
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
 			System.exit(0);
@@ -263,6 +265,7 @@ public class Huffman {
 			fileOut.renameTo(fileIn);
 			fileOut.delete();
 		} catch (FileNotFoundException e) {
+			System.out.println("Arquivo não encontrado");
 			System.exit(0);
 			e.printStackTrace();
 		} catch (IOException e) {
