@@ -163,32 +163,37 @@ public class Huffman {
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 			String[] result;
-			int freeBistInLastByte = 0;
+			int freeBitsInLastByte = 0;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
-						result = save(code, buffer, dataOut, (i+1) == nBytes);
+						boolean isLastByte = ((i+1) == nBytes);
+						result = save(code, buffer, dataOut, isLastByte);
 						buffer = result[0]; //Atualizando o buffer
-						freeBistInLastByte = Integer.parseInt(result[1]);
+						if (isLastByte)
+							freeBitsInLastByte = Integer.parseInt(result[1]);
 						
 					}
 				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
 								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
-						result = save(code, buffer, dataOut, (i+1) == nBytes);
+						boolean isLastByte = ((i+1) == nBytes);
+						result = save(code, buffer, dataOut, isLastByte);
 						buffer = result[0]; //Atualizando o buffer
-						freeBistInLastByte = Integer.parseInt(result[1]);
+						if (isLastByte)
+							freeBitsInLastByte = Integer.parseInt(result[1]);
 					}
 				}
 			}
 			
-			if (freeBistInLastByte > 7 || freeBistInLastByte < 1) {
+			if (freeBitsInLastByte > 7 || freeBitsInLastByte < 1) {
 				System.out.println("Número inválido de bits livres no último byte");
 				System.exit(0);
 			}
-			putHeader(freeBistInLastByte);
+			System.out.println("Número de bits do último byte: "+freeBitsInLastByte);
+			putHeader(freeBitsInLastByte);
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
 			System.exit(0);
@@ -284,14 +289,17 @@ public class Huffman {
 				} else if (buffer.length() < 8 && isLastByte) {
 					System.out.println("ultimo codigo salvo: "+buffer);
 					data.writeByte(getByte(buffer));
-					buffer = "";
 					result[1] = (8-buffer.length())+"";
+					buffer = "";
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 				}
 		result[0] = buffer;
+		while(true) {
+			break;
+		}
 		return result;
 	}
 	
