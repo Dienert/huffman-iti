@@ -125,12 +125,22 @@ public class Decoder {
 			//opção 1: gerar Hash e ir pegando.
 			hashCodes = Huffman.generateHashSimbolsAndCodes(raiz, "");
 			
+			//opção 2: percorrer árvore buscando o nó folha
+			
+	
+			
 			while((nBytes = data.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=numeroDeSimbolos; i<nBytes; i++) {
 						//buscará a palavra código no hash e devolverá a palavra bonitinha
 						String temp = Byte.toString(assinatura[i]);
 						String decodificada = hashCodes.get(temp);
+						
+						//no caso de percorrer a árvore:
+						
+						
+						
+						
 						putWord(decodificada);
 						
 						//colocar em um arquivo?
@@ -189,6 +199,14 @@ public class Decoder {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String percorreArvore(No raiz, byte b){
+		No temp = raiz;
+		while(raiz!= null){
+			
+		}
+		
 	}
 }
 
