@@ -84,7 +84,7 @@ public class Decoder {
 			
 			
 			byte[] assinatura = new byte[1024];  
-			int nBytes;
+			int nBytes = 0;
 			int lidos = 0;
 			
 				if(type.equals(ONE_BYTE)) {
@@ -190,7 +190,7 @@ public class Decoder {
 			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
 			DataOutputStream dataOut = new DataOutputStream(buffWriter);
 
-			dataOut.writeByte(Byte.parseByte(abc));
+				
 			
 				
 		} catch (FileNotFoundException e) {
@@ -201,12 +201,12 @@ public class Decoder {
 		}
 	}
 	
-	public static String percorreArvore(No raiz, byte b){
+/*	public static String percorreArvore(No raiz, byte b){
 		No temp = raiz;
 		while(raiz!= null){
 			
 		}
 		
-	}
+	}*/
 }
 

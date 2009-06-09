@@ -142,8 +142,8 @@ public class Huffman {
 	public static Hashtable<String, String> generateHashSimbolsAndCodes(No raiz, String code) {
 		Hashtable<String, String> hash = new Hashtable<String, String>();
 		if (raiz != null) {
-			generateHashSimbolsAndCodes(raiz.getFilhoEsq(), code+"0");
-			generateHashSimbolsAndCodes(raiz.getFilhoDir(), code+"1");
+			hashCodes = generateHashSimbolsAndCodes(raiz.getFilhoEsq(), code+"0");
+			hashCodes = generateHashSimbolsAndCodes(raiz.getFilhoDir(), code+"1");
 			if (raiz.getFilhoEsq() == null && raiz.getFilhoDir() == null) {
 				hashCodes.put(raiz.getCaracter(), code);
 			}
