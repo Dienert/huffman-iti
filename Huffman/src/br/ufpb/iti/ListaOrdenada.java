@@ -75,14 +75,16 @@ public class ListaOrdenada {
 	 * @param hash Hashtable contendo os símbolos e suas respectivas frequencias
 	 * 
 	 */
-	public void constroiLista(Hashtable<String, Integer> hash){
+	public int constroiLista(Hashtable<String, Integer> hash){
 		Enumeration<String> enumeration = hash.keys();
 		//Constroi a lista ordenada da HashTable
+		int size = 0;
 		while(enumeration.hasMoreElements()) {
 			String charac = enumeration.nextElement();
 			this.insere(new No(charac.toString(), hash.get(charac)));
+			size++;
 		}
-		
+		return size;
 	}
 
 	public No getFirst() {
