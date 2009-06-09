@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -143,21 +142,33 @@ public class Huffman {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
-			DataInputStream data = new DataInputStream(buffReader);  
+			DataInputStream dataIn = new DataInputStream(buffReader);  
+			
+			if (!absolutePath.equals("")) {
+				int lastIndx = absolutePath.lastIndexOf(".");
+				absolutePathResult = absolutePath.substring(0, lastIndx+1)+"adh";
+			} else {
+				absolutePathResult = "/tmp/teste.adh";
+			}
+			
+			FileOutputStream fWriter = new FileOutputStream(absolutePathResult);
+			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
+			DataOutputStream dataOut = new DataOutputStream(buffWriter);
 			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
-			while((nBytes = data.read(assinatura)) != -1) {
+			while((nBytes = dataIn.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
-						save(code);
+						save(code, buffer, dataOut, (i+1) == nBytes);
+						
 					}
 				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
 								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
-						save(code);
+						save(code, buffer, dataOut, (i+1) == nBytes);
 					}
 				}
 			}
@@ -192,44 +203,47 @@ public class Huffman {
 //	}
 	
 	/**
-	 * 
 	 * Salva um código binário em arquivo. Utiliza-se um buffer para que os dados
 	 * sejam salvos de byte em byte.
-	 * 
+	 * @param code
+	 * @param isLastByte
+	 * @return O numero de bits que não são utilizados no ultimo byte
 	 */
-	public static void save(String code) {
+	public static int save(String code, String buffer, DataOutputStream data, boolean isLastByte) {
+		
+		int bufferSize = buffer.length();
+		int codeSize = code.length();
+		int freeSpace = 8-bufferSize;
+		
 		try {
-			int lastIndx = absolutePath.lastIndexOf(".");
-			absolutePathResult = absolutePath.substring(0, lastIndx+1)+"adh";
-			FileOutputStream fWriter = new FileOutputStream(absolutePathResult);
-			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
-			DataOutputStream data = new DataOutputStream(buffWriter);
-			
-			int size = buffer.length();
-			int codeSize = code.length();
-			if (8-size < codeSize) {
+			if (freeSpace < codeSize) {
 				//Se o espaço que falta no buffer é menor que o tamanho do codigo 
 				//passado, entao o codigo eh quebrado e o restante eh colocado no buffer
-				String[] result = divideCode(code, size);
+				String[] result = divideCode(code, freeSpace);
+				buffer = buffer+result[0];
+				//Este save garante que o code apresenta 8 bits
+				//para ser salvo, o buffer eh zerado
+				save(buffer, "", data, isLastByte);
 				buffer = result[1]; //coloca o restante no buffer
-				code = result[0];
-				size = buffer.length();
-				codeSize = code.length();
-			}
-			if (8-size >= codeSize) {
+				if (buffer.length() >= 8) {
+					save(buffer, "", data, isLastByte);
+				}
+			} else if (freeSpace >= codeSize) {
 				buffer = buffer+code;
 				if (buffer.length() == 8) {
+					System.out.println("codigo salvo: "+buffer);
+					data.writeByte(getByte(buffer));
+					buffer = "";
+				} else if (buffer.length() < 8 && isLastByte) {
+					System.out.println("ultimo codigo salvo: "+buffer);
 					data.writeByte(getByte(buffer));
 					buffer = "";
 				}
 			}
-		} catch (FileNotFoundException e) {
-			System.out.println("Arquivo não encontrado");
-			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
+				}
+		return 0;
 	}
 	
 	/**
