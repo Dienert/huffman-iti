@@ -100,7 +100,7 @@ public class Huffman {
 //			else System.out.println("raiz não existe");
 			
 			//Gera um hash de simbolos e seus codigos
-			generateHashSimbolsAndCodes(raiz, "");
+			hashCodes = generateHashSimbolsAndCodes(raiz, "");
 			
 			System.out.println(hashFrequencia);
 			System.out.println(hashCodes);
@@ -139,7 +139,8 @@ public class Huffman {
 	 * @param code Código inicial da raiz que será usado recursivamente
 	 * 
 	 */
-	public static void generateHashSimbolsAndCodes(No raiz, String code) {
+	public static Hashtable<String, String> generateHashSimbolsAndCodes(No raiz, String code) {
+		Hashtable<String, String> hash = new Hashtable<String, String>();
 		if (raiz != null) {
 			generateHashSimbolsAndCodes(raiz.getFilhoEsq(), code+"0");
 			generateHashSimbolsAndCodes(raiz.getFilhoDir(), code+"1");
@@ -147,6 +148,7 @@ public class Huffman {
 				hashCodes.put(raiz.getCaracter(), code);
 			}
 		}
+		return hash;
 	}
 	
 	/**
