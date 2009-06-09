@@ -4,11 +4,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Hashtable;
 
 public class Huffman {
@@ -44,6 +44,7 @@ public class Huffman {
 		int size = args.length;
 		String fileName = "";
 		
+		currentTime();
 		if (size >= 1)
 			fileName = args[0];
 		if(size == 2)
@@ -89,15 +90,16 @@ public class Huffman {
 		
 			No raiz = No.constroiArvore(lista);
 			
-			if(raiz != null)
-				No.mostraArvore(raiz);
-			else System.out.println("raiz não existe");
+//			if(raiz != null)
+//				No.mostraArvore(raiz);
+//			else System.out.println("raiz não existe");
 			
 			//Gera um hash de simbolos e seus codigos
 			generateHashSimbolsAndCodes(raiz, "");
 			
 			//Inicia codificacao da mensagem
 			codification();
+			currentTime();
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado");
@@ -168,10 +170,10 @@ public class Huffman {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
-						boolean isLastByte = ((i+1) == nBytes);
+						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
 						result = save(code, buffer, dataOut, isLastByte);
 						buffer = result[0]; //Atualizando o buffer
-						if (isLastByte)
+						if (isLastByte && result[1] != null)
 							freeBitsInLastByte = Integer.parseInt(result[1]);
 						
 					}
@@ -179,10 +181,10 @@ public class Huffman {
 					for (int i=0; i<nBytes; i+=2) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
 								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
-						boolean isLastByte = ((i+1) == nBytes);
+						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
 						result = save(code, buffer, dataOut, isLastByte);
 						buffer = result[0]; //Atualizando o buffer
-						if (isLastByte)
+						if (isLastByte && result[1] != null)
 							freeBitsInLastByte = Integer.parseInt(result[1]);
 					}
 				}
@@ -192,7 +194,7 @@ public class Huffman {
 				System.out.println("Número inválido de bits livres no último byte");
 				System.exit(0);
 			}
-			System.out.println("Número de bits do último byte: "+freeBitsInLastByte);
+			System.out.println("Número de bits livres do último byte: "+freeBitsInLastByte);
 			putHeader(freeBitsInLastByte);
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
@@ -279,17 +281,20 @@ public class Huffman {
 				buffer = divided[1]; //coloca o restante no buffer
 				if (buffer.length() >= 8) {
 					result = save(buffer, "", data, isLastByte);
+					return result;
 				}
 			} else if (freeSpace >= codeSize) {
 				buffer = buffer+code;
 				if (buffer.length() == 8) {
-					System.out.println("codigo salvo: "+buffer);
+					System.out.print(buffer);
 					data.writeByte(getByte(buffer));
 					buffer = "";
 				} else if (buffer.length() < 8 && isLastByte) {
-					System.out.println("ultimo codigo salvo: "+buffer);
+					System.out.println("\nultimo codigo salvo: "+buffer);
 					data.writeByte(getByte(buffer));
-					result[1] = (8-buffer.length())+"";
+					if (buffer.equals(""))
+						result[1] = "0";
+					else result[1] = (8-buffer.length())+"";
 					buffer = "";
 				}
 			}
@@ -345,6 +350,18 @@ public class Huffman {
 			entropia += ((aux.getFreq()/lidos) * (Math.log(1/aux.getFreq())));
 		}
 		return entropia;
+	}
+	
+	public static String currentTime() {
+		long time = System.currentTimeMillis();
+		Calendar.getInstance().setTimeInMillis(time);
+		int hour = Calendar.getInstance().get(Calendar.HOUR);
+		int minute = Calendar.getInstance().get(Calendar.MINUTE);
+		int second = Calendar.getInstance().get(Calendar.SECOND);
+		int mili = Calendar.getInstance().get(Calendar.MILLISECOND);
+		String out = hour+":"+minute+":"+second+"."+mili;
+		System.out.println("Time: "+out);
+		return out;
 	}
 	
 }
