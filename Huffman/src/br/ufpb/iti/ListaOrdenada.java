@@ -69,20 +69,25 @@ public class ListaOrdenada {
 	}
 	
 	/**
-	 * 
+	 *
 	 * Constrói uma lista duplamente encadeada ordenada pelo número da frequencia
 	 * de cada símbolo existente na hashtable
 	 * @param hash Hashtable contendo os símbolos e suas respectivas frequencias
-	 * 
+	 * @return O numero de simbolos da mensagem original no indice 0 do array e 
+	 * o numero de simbolos diferentes utilizados do alfabeto
+	 *
 	 */
-	public int constroiLista(Hashtable<String, Integer> hash){
+	public int[] constroiLista(Hashtable<String, Integer> hash){
 		Enumeration<String> enumeration = hash.keys();
 		//Constroi a lista ordenada da HashTable
-		int size = 0;
+		int size[] = {0, 0};
 		while(enumeration.hasMoreElements()) {
 			String charac = enumeration.nextElement();
-			this.insere(new No(charac.toString(), hash.get(charac)));
-			size++;
+			int freq = hash.get(charac);
+			No no = new No(charac.toString(), freq);
+			this.insere(no);
+			size[0] += freq;
+			size[1]++;
 		}
 		return size;
 	}
