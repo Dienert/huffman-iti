@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class Huffman {
@@ -83,28 +84,34 @@ public class Huffman {
 						lidos++;
 					}
 				}
-				
 			}
 			
-			int numeroDeSimbolosUsados = lista.constroiLista(hashFrequencia); //Constroi a lista ordenada da HashTable
-		
-			System.out.println("Numero de símbolos usados: "+numeroDeSimbolosUsados);
+			//array que armazena o numero de simbolos da mensagem original no
+			//indice 0 e o numero de simbolos diferentes no indice 1
+			int[] counters;
+			
+			//Constroi a lista ordenada da HashTable
+			counters = lista.constroiLista(hashFrequencia); 
+			
+			System.out.println("Numero de símbolos da mensagem: "+counters[0]);
+			
+			System.out.println("Numero de símbolos diferentes da mensagem: "+counters[1]);
+			
+			System.out.println("Entropia: "+calculaEntropia(lista, counters[0]));
 			
 			No raiz = No.constroiArvore(lista);
-			
-//			if(raiz != null)
-//				No.mostraArvore(raiz);
-//			else System.out.println("raiz não existe");
 			
 			//Gera um hash de simbolos e seus codigos
 			updateHashSimbolsAndCodes(raiz, "");
 			
-			System.out.println(hashFrequencia);
-			System.out.println(hashCodes);
+//			System.out.println(hashFrequencia);
+//			System.out.println(hashCodes);
 			
 			//Inicia codificacao da mensagem
-			int freeBist = codification();
-			putHeader(numeroDeSimbolosUsados, freeBist, hashFrequencia, absolutePathResult);
+			codification();
+			
+			putHeader(counters, hashFrequencia, absolutePathResult);
+			
 			currentTime();
 			
 		} catch (FileNotFoundException e) {
@@ -153,67 +160,50 @@ public class Huffman {
 	 * de codificação: usando 1 byte ou 2 bytes.
 	 * 
 	 */
-	public static int codification() {
-		int freeBitsInLastByte = 0;
+	public static void codification() {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 			DataInputStream dataIn = new DataInputStream(buffReader);  
-			
+
 			if (!absolutePath.equals("")) {
 				int lastIndx = absolutePath.lastIndexOf(".");
-				absolutePathResult = absolutePath.substring(0, lastIndx+1)+"adh";
+				if (lastIndx == -1)
+					absolutePathResult = absolutePath+".adh";
+				else absolutePathResult = absolutePath.substring(0, lastIndx+1)+"adh";
 			} else {
 				absolutePathResult = "/tmp/teste.adh";
 			}
-			
+
 			FileWriter fWriter = new FileWriter(absolutePathResult);
 			BufferedWriter out = new BufferedWriter(fWriter);
-			
+
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
-			String[] result = {"", ""};
 
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
 						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
-						result = save(code, buffer, out, isLastByte);
-						buffer = result[0]; //Atualizando o buffer
-						if (isLastByte && result[1] != null)
-							freeBitsInLastByte = Integer.parseInt(result[1]);
-						
+						buffer = save(code, buffer, out, isLastByte); //Atualizando o buffer
 					}
 				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
 						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
 								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
 						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
-						result = save(code, buffer, out, isLastByte);
-						buffer = result[0]; //Atualizando o buffer
-						if (isLastByte && result[1] != null)
-							freeBitsInLastByte = Integer.parseInt(result[1]);
+						buffer = save(code, buffer, out, isLastByte); //Atualizando o buffer
 					}
 				}
 			}
-			
 			out.close();
-			
-			if (freeBitsInLastByte > 7 || freeBitsInLastByte < 0) {
-				System.out.println("\nNúmero inválido de bits livres no último byte");
-				System.out.println(result[1]);
-				System.out.println("buffer: "+buffer);
-				System.exit(0);
-			}
-			System.out.println("Número de bits livres do último byte: "+freeBitsInLastByte);
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
 			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return freeBitsInLastByte;
 	}
 	
 //	public static String getCode(No no) {
@@ -237,7 +227,7 @@ public class Huffman {
 //		return new String(newCode);
 //	}
 	
-	public static void putHeader(int bitsUsados, int freeBits, Hashtable<String, Integer> hash, String absolutePath) {
+	public static void putHeader(int[] counters, Hashtable<String, Integer>hashFreq, String absolutePath) {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
@@ -246,11 +236,50 @@ public class Huffman {
 			FileWriter fWriter = new FileWriter(absolutePath+".tmp");
 			BufferedWriter out = new BufferedWriter(fWriter);
 			
-			out.write(bitsUsados);
-			out.write(freeBits);
+			buffer = "";
 			
+			int messageSize = counters[0];
+			int usedSimbolsNumber = counters[1];
 			
+			//Montagem da parte inicial do cabeçalho
+			//O primeiro bit eh relativo ao número de bytes usados para cada símbolo
+			//Se forem 8 bits => 1º bit = 0
+			//Se forem 16 bits => 1º bit = 1
+			String parteFixa = type.equals(ONE_BYTE)?"0":"1"+ // 1º bit
+					  		   getFormatedCode(messageSize, 32)+ // Nº de símbolos da msg
+					  		   getFormatedCode(usedSimbolsNumber, 32); // Nº de símbolos diferentes da msg
 			
+			buffer = save(parteFixa, buffer, out, false);
+			
+			No aux = lista.getFirst();
+			
+			Enumeration<String> enumeration = hashFreq.keys();
+			
+			int count = 1;
+			if (type.equals(ONE_BYTE)) {
+				while(enumeration.hasMoreElements()) {
+					String simbol = enumeration.nextElement();
+					int freq = hashFreq.get(simbol);
+					char charac = simbol.charAt(0);
+					buffer = save(getFormatedCode(charac, 8)+
+								  getFormatedCode(freq, 32), 
+								  buffer, out, count==usedSimbolsNumber);
+				}
+			} else {
+				while(enumeration.hasMoreElements()) {
+					String simbol = enumeration.nextElement();
+					int freq = hashFreq.get(simbol);
+					char char1 = simbol.charAt(0);
+					char char2 = simbol.charAt(1);
+					buffer = save(getFormatedCode(char1, 8)+
+								  getFormatedCode(char2, 8)+
+								  getFormatedCode(freq, 32),
+								  buffer, out, count==usedSimbolsNumber);
+				}
+				
+			}
+			
+			//Adiciona a mensagem codificada
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
@@ -279,18 +308,15 @@ public class Huffman {
 	 * sejam salvos de byte em byte.
 	 * @param code
 	 * @param isLastByte
-	 * @return Array de Strings que contém, onde o primeiro elemento é o novo 
-	 * buffer a ser atualizado e e o segundo é o número de bits q estão livres
-	 * no útlimo byte, caso isLastByte seja igual a false, então este elemento 
-	 * é igual a <i>null</i> 
+	 * @return Array de Strings que contém o novo buffer a ser atualizado
 	 */
-	public static String[] save(String code, String buffer, BufferedWriter out, boolean isLastByte) {
-		
+	public static String save(String code, String buffer, BufferedWriter out, boolean isLastByte) {
+
 		int bufferSize = buffer.length();
 		int codeSize = code.length();
 		int freeSpace = 8-bufferSize;
-		String[] result = {buffer, "0"};
-		
+		String result = buffer;
+
 		try {
 			if (freeSpace < codeSize) {
 				//Se o espaço que falta no buffer é menor que o tamanho do codigo 
@@ -308,27 +334,19 @@ public class Huffman {
 			} else if (freeSpace >= codeSize) {
 				buffer = buffer+code;
 				if (buffer.length() == 8) {
-					if(isLastByte)
-						System.out.print("\nultimo codigo salvo: "+buffer);
-					else System.out.print(buffer+"|");
+//					System.out.print(buffer+"|");
 					out.write(getByte(buffer));
 					buffer = "";
 				} else if (buffer.length() < 8 && isLastByte) {
-					System.out.println("\nultimo codigo salvo: "+buffer);
+//					System.out.println("\nUltimo codigo salvo: "+buffer);
 					out.write(getByte(buffer));
-					if (buffer.equals(""))
-						result[1] = "0";
-					else result[1] = (8-buffer.length())+"";
 					buffer = "";
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-				}
-		result[0] = buffer;
-		while(true) {
-			break;
 		}
+		result = buffer;
 		return result;
 	}
 	
@@ -345,6 +363,41 @@ public class Huffman {
 			if (code.charAt(j) == '1')
 				result += Math.pow(2, i);
 		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * Retorna um String relativa ao código binário de um inteiro
+	 * @param inteiro Número decimal a ser convertido em binário representado como
+	 * String
+	 * @return A String que representa o binário
+	 * 
+	 */
+	public static String getCode(int inteiro) {
+		int resto = inteiro%2;
+		int quosc = inteiro/2;
+		String result = Integer.toString(resto);
+		return inteiro==0?"":getCode(quosc)+result;
+	}
+	
+	/**
+	 * 
+	 * Converte um inteiro para binário em forma de String com um número exato de
+	 * bits, completando com zero os bits que não forem usados.
+	 * @param inteiro Número a ser convertido para binário
+	 * @param nBits Número de bits que a String deve ter
+	 * @return String formatada de acordo com o número de bits especificados
+	 * @see #getCode(int)
+	 * 
+	 */
+	public static String getFormatedCode(int inteiro, int nBits) {
+		String result = getCode(inteiro);
+		int actualSize = result.length();
+		if (nBits != actualSize) {
+			for (int i=0; i<(nBits-actualSize);i++)
+				result = "0"+result;
+		}			
 		return result;
 	}
 	
@@ -371,9 +424,9 @@ public class Huffman {
 		No aux = lista.getFirst();
 		float entropia = 0.0f;
 		for(; aux!=null; aux = aux.getDir()){
-			entropia += ((aux.getFreq()/lidos) * (Math.log(1/aux.getFreq())));
+			entropia += ((aux.getFreq()/(float)lidos) * (Math.log(1/(float)aux.getFreq())));
 		}
-		return entropia;
+		return -entropia;
 	}
 	
 	public static String currentTime() {
