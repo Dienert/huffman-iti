@@ -40,7 +40,171 @@ ou no hash
  */
 public class Decoder {
 	
-	private static Hashtable<String, Integer> hashFrequencia = new Hashtable<String, Integer>();
+	
+	
+	
+	private static String absolutePath = "";
+	private static String absolutePathResult = "";
+	private static int modo = -1;
+	
+	
+	//começando do zero!
+	//abre o arquivo
+	
+
+	/**
+	 * 
+	 * Imprime a sintaxe correta de uso do programa
+	 * 
+	 */
+	public static void printSyntax() {
+		System.out.println("Usage: java HuffmanDecoder file ");
+				
+		System.exit(1);
+	}
+	
+	
+	//abrir fluxo e ler arquivo
+	public static void main(String[] args) {
+		
+		int size = args.length;
+		String fileName = "";
+				
+		if (size >= 1){
+			fileName = args[0];
+		}
+		
+		if (fileName.equals("")) {
+			printSyntax();
+		
+		
+				//Pega o caminho absoluto do arquivo
+				absolutePath = ClassLoader.getSystemResource(fileName).toString().replace("file:", "");
+				FileInputStream fReader;
+				try {
+					fReader = new FileInputStream(absolutePath);
+				
+				BufferedInputStream buffReader = new BufferedInputStream(fReader);  
+				DataInputStream data = new DataInputStream(buffReader);  
+		
+				
+				
+				//se funciona, você não questiona =P
+				byte[] assinatura = new byte[1024];  
+				int[] indices = new int[8*1024];
+				int[] teste = new int[8*9];
+				
+				
+				data.read(assinatura);
+				teste = deByteArrayParaIntArray(assinatura, 9);
+				
+				modo = teste[0];
+				for (int i = 0; i < teste.length; i++) {
+					System.out.println(teste[i]);
+				}
+				
+				
+				
+				int[] primeiros = new int[8*8];
+				
+				for (int i = 0; i < primeiros.length; i++) {
+					primeiros[i] = teste[i+1];
+				}
+				
+				int[] cabecalho = numerosDeIndices(primeiros);
+				
+				
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		
+	}
+	
+		
+		
+		//melhor pegar 4 arrays de inteiros  e convertê-los
+		
+		
+		/*o método seguinte irá converter o byte para um array de inteiros representando os índices para compor o número maior.  
+		 * ... eu acho
+		 */
+	public static int[] deByteArrayParaIntArray(byte[] bytes, int nBytes){
+		//passando esse array, se eu fizer uma modificação,
+		//quando o método acabar, a modificação continua feita?
+		
+		int[] indices = new int[1024*8]; 
+		int[] temporario = new int[8];
+		
+		for(int i = 0; i<nBytes; i++){ //de byte em byte
+			int valor = bytes[i]; 
+			
+			for(int j = 0; j<8; j++){
+				valor = valor %2; //convertendo de byte para int implicitamente
+				temporario[8-j] = valor;					 //ao fazer bytes[i]%2 
+			}
+			
+			for(int j = 0; j< 8; j++){
+				indices[j+(8*i)] = temporario[j];
+			}
+		}
+		return indices;
+	}
+	
+//melhor fazer para cada byte individualmente
+	
+	/*entrada: um array com número múltiplo de 8 contendo índices. no caso
+	 * do decodificador, temos que pgar a partir do 2º bit lido até o 33º,
+	 * já que o primeiro é usado para identificar o modo de leitura	 * 
+	 */
+	
+	public static int[] numerosDeIndices(int[] indices){
+		int[] numeros = new int[indices.length/32];
+		
+		for (int i = 0; i < indices.length; i+=32) {
+			
+			for(int j =0; j<32; j++){
+				numeros[i/32] +=  ((int) Math.pow(2.0,0.0+j)) * indices[i + j];
+			}
+			
+		}
+		
+		return numeros;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+/*	private static Hashtable<String, Integer> hashFrequencia = new Hashtable<String, Integer>();
 	private static Hashtable<String, String> hashCodes = new Hashtable<String, String>();
 	private static ListaOrdenada lista = new ListaOrdenada();
 	
@@ -64,9 +228,9 @@ public class Decoder {
 		if(size == 2)
 			type = args[1];
 		
-	/*	if (fileName.equals("") || !(type.equals(ONE_BYTE) || type.equals(TWO_BYTES))) {
+		if (fileName.equals("") || !(type.equals(ONE_BYTE) || type.equals(TWO_BYTES))) {
 			printSyntax();
-		}*/
+		}
 		
 		try {
 			//Pega o caminho absoluto do arquivo
@@ -201,7 +365,7 @@ public class Decoder {
 		}
 	}
 	
-/*	public static String percorreArvore(No raiz, byte b){
+	public static String percorreArvore(No raiz, byte b){
 		No temp = raiz;
 		while(raiz!= null){
 			

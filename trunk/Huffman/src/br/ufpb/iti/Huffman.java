@@ -78,7 +78,8 @@ public class Huffman {
 						//Esta linha converte dois bytes para 2 chars e depois para String
 						//e insere o caracter na hashtable de frenquencias
 						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)+
-								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
+								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF)))); 
+						//para que danado serve esse 0xFF ... ele significa true... então é par
 						//caso a linha i+1 seja igual ao numero de bytes lidos, entao
 						//o segundo caracter nao existe, e serah inserido apenas 1 caracter na hashtable
 						lidos++;
