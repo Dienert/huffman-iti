@@ -66,7 +66,7 @@ public class Decoder {
 	
 	//abrir fluxo e ler arquivo
 	public static void main(String[] args) {
-		
+		System.out.println("aqui");
 		int size = args.length;
 		String fileName = "";
 				
@@ -76,7 +76,7 @@ public class Decoder {
 		
 		if (fileName.equals("")) {
 			printSyntax();
-		
+		}
 		
 				//Pega o caminho absoluto do arquivo
 				absolutePath = ClassLoader.getSystemResource(fileName).toString().replace("file:", "");
@@ -99,9 +99,10 @@ public class Decoder {
 				teste = deByteArrayParaIntArray(assinatura, 9);
 				
 				modo = teste[0];
-				for (int i = 0; i < teste.length; i++) {
-					System.out.println(teste[i]);
-				}
+				System.out.println("modo: "+modo);
+			/*	for (int i = 0; i < teste.length; i++) {
+					System.out.print(teste[i]);
+				}*/
 				
 				
 				
@@ -113,6 +114,8 @@ public class Decoder {
 				
 				int[] cabecalho = numerosDeIndices(primeiros);
 				
+				System.out.println(cabecalho[0] + " " + cabecalho[1]);
+				
 				
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -123,7 +126,7 @@ public class Decoder {
 				}
 		}
 		
-	}
+	
 	
 		
 		
@@ -138,15 +141,22 @@ public class Decoder {
 		//quando o método acabar, a modificação continua feita?
 		
 		int[] indices = new int[1024*8]; 
-		int[] temporario = new int[8];
+		int[] temporario = {-1,-1,-1,-1,-1,-1,-1,-1};
 		
 		for(int i = 0; i<nBytes; i++){ //de byte em byte
-			int valor = bytes[i]; 
-			
-			for(int j = 0; j<8; j++){
-				valor = valor %2; //convertendo de byte para int implicitamente
-				temporario[8-j] = valor;					 //ao fazer bytes[i]%2 
+			int valor = (int) bytes[i]; 
+			//System.out.println("valor: " +valor);
+
+			for(int j = 1; j<=8; j++){
+				 //convertendo de byte para int implicitamente
+				temporario[8-j] = valor%2;		
+				valor = valor/2;
 			}
+//			System.out.println("temporario:");
+//			for (int j = 0; j < temporario.length; j++) {
+//				System.out.print(temporario[j]);
+//			}
+//			System.out.println("\n");
 			
 			for(int j = 0; j< 8; j++){
 				indices[j+(8*i)] = temporario[j];
