@@ -96,11 +96,15 @@ public class Decoder {
 				
 				
 				data.read(assinatura);
+				for (int i = 0; i < assinatura.length; i++) {
+					System.out.print(assinatura[i]+" ");
+					
+				}
 				teste = deByteArrayParaIntArray(assinatura, 9);
 				
 				modo = teste[0];
-				System.out.println("modo: "+modo);
-			/*	for (int i = 0; i < teste.length; i++) {
+/*				System.out.println("modo: "+modo);
+				for (int i = 0; i < teste.length; i++) {
 					System.out.print(teste[i]);
 				}*/
 				
@@ -112,7 +116,7 @@ public class Decoder {
 					primeiros[i] = teste[i+1];
 				}
 				
-				int[] cabecalho = numerosDeIndices(primeiros);
+				long[] cabecalho = numerosDeIndices(primeiros);
 				
 				System.out.println(cabecalho[0] + " " + cabecalho[1]);
 				
@@ -145,18 +149,27 @@ public class Decoder {
 		
 		for(int i = 0; i<nBytes; i++){ //de byte em byte
 			int valor = (int) bytes[i]; 
-			//System.out.println("valor: " +valor);
-
-			for(int j = 1; j<=8; j++){
-				 //convertendo de byte para int implicitamente
-				temporario[8-j] = valor%2;		
-				valor = valor/2;
+			System.out.println("valor: " +valor);
+			if(valor>=0){
+				for(int j = 1; j<=8; j++){
+					 //convertendo de byte para int implicitamente
+					temporario[8-j] = valor%2;		
+					valor = valor/2;
+				}
 			}
-//			System.out.println("temporario:");
-//			for (int j = 0; j < temporario.length; j++) {
-//				System.out.print(temporario[j]);
-//			}
-//			System.out.println("\n");
+			else{
+				temporario[0] = 1;
+				valor = Math.abs(valor);
+				for (int j = 0; j < 7; j++) {
+					temporario[7-j] = valor%2;		
+					valor = valor/2;
+				}
+			}
+			System.out.println("temporario:");
+			for (int j = 0; j < temporario.length; j++) {
+				System.out.print(temporario[j]);
+			}
+			System.out.println("\n");
 			
 			for(int j = 0; j< 8; j++){
 				indices[j+(8*i)] = temporario[j];
@@ -172,13 +185,13 @@ public class Decoder {
 	 * já que o primeiro é usado para identificar o modo de leitura	 * 
 	 */
 	
-	public static int[] numerosDeIndices(int[] indices){
-		int[] numeros = new int[indices.length/32];
+	public static long[] numerosDeIndices(int[] indices){
+		long[] numeros = new long[indices.length/32];
 		
-		for (int i = 0; i < indices.length; i+=32) {
+		for (int i = 0; i < numeros.length; i++) {
 			
-			for(int j =0; j<32; j++){
-				numeros[i/32] +=  ((int) Math.pow(2.0,0.0+j)) * indices[i + j];
+			for(int j =1; j<=32; j++){
+				numeros[i] +=  ((int) Math.pow(2.0, 32-j)) * indices[(i*32) + j-1];
 			}
 			
 		}
