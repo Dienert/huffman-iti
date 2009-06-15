@@ -46,6 +46,7 @@ public class Decoder {
 	private static String absolutePath = "";
 	private static String absolutePathResult = "";
 	private static int modo = -1;
+	private static Hashtable<String, Integer> hashFrequencia = new Hashtable<String, Integer>();
 	
 	
 	//começando do zero!
@@ -116,9 +117,59 @@ public class Decoder {
 					primeiros[i] = teste[i+1];
 				}
 				
-				long[] cabecalho = numerosDeIndices(primeiros);
+				long[] cabecalho = numerosDeIndices(primeiros, 32);
 				
 				System.out.println(cabecalho[0] + " " + cabecalho[1]);
+				
+				
+				
+				//será que tá dando errado porque eu estou lendo coisas demais???
+				
+				int frequenciasLidas = 0;
+				int bytesLidos = 9;
+				int[] temporario = new int[8]; 
+				
+				while(frequenciasLidas != cabecalho[1]){
+					if(bytesLidos == 1024){
+						data.read(assinatura);
+						bytesLidos = 0;
+					}
+					
+					//assinatura[bytesLidos+1]
+					           //TODO continuar a partir daqui
+					
+					
+					
+					
+				}
+				
+				/* ler símbolo e sua frequencia e guardar na hash.
+				 * 
+				 * como?
+				 * 
+				 * sobraram 7 bits depois que o cabeçalho foi lido.
+				 * leio mais 5 bytes (8 bits para o caracter e 32 para sua frequencia).
+				 * sobrarão 7 novamente. vou lendo até que numeroDeFrequenciasLidas == 
+				 * númeroDeSimbolosDiferentes.
+				 * 
+				 * mas como vou saber que tal símbolo é tal símbolo? quer dizer, estou lendo em binário...
+				 * só converter direto em caracter funciona?
+				 */
+				/*
+				 * depois, armazenará na hash os 7 bits restantes do último byte 
+				 *	depois, tem que ler os 1024-9 restantes e continuar lendo até que
+				 *lidos seja igual ao número de símbolos existentes
+				 *
+				 * em seguida, cria uma lista a partir da hash e depois a árvore
+				 * 
+				 * para decodificar, teremos que ler novamente o arquivo. abre, 
+				 * lê primeiros 9 bytes, só considera os 7 últimos bits do último.
+				 * em seguida, faz um for percorrendo os 1024 - 9 restantes e
+				 * continuar codificando até que seja igual ao número de símbolos
+				 * existentes. 
+				 */
+				
+				
 				
 				
 				} catch (FileNotFoundException e) {
@@ -185,13 +236,14 @@ public class Decoder {
 	 * já que o primeiro é usado para identificar o modo de leitura	 * 
 	 */
 	
-	public static long[] numerosDeIndices(int[] indices){
-		long[] numeros = new long[indices.length/32];
+	//esse a é só para não usar 32... vou pensar em um nome melhor para esse argumento.
+	public static long[] numerosDeIndices(int[] indices, int a){
+		long[] numeros = new long[indices.length/a];
 		
 		for (int i = 0; i < numeros.length; i++) {
 			
-			for(int j =1; j<=32; j++){
-				numeros[i] +=  ((int) Math.pow(2.0, 32-j)) * indices[(i*32) + j-1];
+			for(int j =1; j<=a; j++){
+				numeros[i] +=  ((int) Math.pow(2.0, a-j)) * indices[(i*a) + j-1];
 			}
 			
 		}
@@ -203,7 +255,13 @@ public class Decoder {
 	
 	
 	
-	
+	public static Hashtable<String, Integer> controiHash(long numero, String nome){
+		Hashtable<String, Integer> hash = new Hashtable<String, Integer>();
+		
+		
+		return hash;
+		
+	}
 	
 	
 	
