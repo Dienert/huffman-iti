@@ -252,8 +252,6 @@ public class Huffman {
 			
 			buffer = save(parteFixa, buffer, out, false);
 			
-			No aux = lista.getFirst();
-			
 			Enumeration<String> enumeration = hashFreq.keys();
 			
 			int count = 1;
@@ -271,9 +269,15 @@ public class Huffman {
 					String simbol = enumeration.nextElement();
 					int freq = hashFreq.get(simbol);
 					char char1 = simbol.charAt(0);
-					char char2 = simbol.charAt(1);
+					int lenght = simbol.length();
+					boolean has2Digits = false;
+					char char2 = ' ';
+					if (lenght == 2) {
+						char2 = simbol.charAt(1);
+						has2Digits = true;
+					}
 					buffer = save(getFormatedCode(char1, 8)+
-								  getFormatedCode(char2, 8)+
+								  (has2Digits ? getFormatedCode(char2, 8) : "")+
 								  getFormatedCode(freq, 32),
 								  buffer, out, count==usedSimbolsNumber);
 				}
@@ -421,6 +425,12 @@ public class Huffman {
 		return result;
 	}
 	
+	/**
+	 * Cálculo da entropia dos dados
+	 * @param lista
+	 * @param lidos
+	 * @return Valo da entropia
+	 */
 	public static float calculaEntropia(ListaOrdenada lista, int lidos){
 		No aux = lista.getFirst();
 		float entropia = 0.0f;
@@ -430,6 +440,12 @@ public class Huffman {
 		return -entropia;
 	}
 	
+	/**
+	 * 
+	 * Imprime o tempo corrente e o retorna como String
+	 * @return Tempo corrente em String
+	 * 
+	 */
 	public static String currentTime() {
 		long time = System.currentTimeMillis();
 		Calendar.getInstance().setTimeInMillis(time);
