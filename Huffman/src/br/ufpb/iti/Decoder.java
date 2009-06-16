@@ -88,17 +88,17 @@ public class Decoder {
 				BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 				DataInputStream data = new DataInputStream(buffReader);  
 		
-				byte[] assinatura = new byte[1024];  
+				int[] assinatura = new int[1024];  
 				int[] teste = new int[8*9];
 				
 				for (int i = 0; i <assinatura.length; i++) {
-					assinatura[i] = data.readByte();
+					assinatura[i] = data.read();
 				}
 				
-				for (int i = 0; i < assinatura.length; i++) {
+				/*for (int i = 0; i < assinatura.length; i++) {
 					System.out.print(assinatura[i]+" ");
 					
-				}
+				}*/
 				teste = deByteArrayParaIntArray(assinatura, 9);
 				
 				modo = teste[0];
@@ -118,9 +118,105 @@ public class Decoder {
 						System.out.println();
 				}
 				
-				long[] cabecalho = numerosDeIndices(primeiros, 32);
+				int[] cabecalho = numerosDeIndices(primeiros, 32);
 				
 				System.out.println(cabecalho[0] + " " + cabecalho[1]);
+				
+				int buffer[] = new int[8];
+				
+				for (int i = 0; i < buffer.length-1; i++) {
+					buffer[i] = primeiros[65+i];
+				}
+				
+				
+				int contador = 9; // bytes lidos 
+				int nSimbolosDiferentes = cabecalho[1];
+				int nLidos = 0;
+				int[] numero = new int[8];
+				int[] temp = new int[1];
+				int[] number = new int[1];
+				char carac = '@';
+				ListaOrdenada lista = new ListaOrdenada();
+				
+				
+				int contadorDeNo = 0;
+				
+				while(nLidos != nSimbolosDiferentes){
+					if(contador == 1024){
+						for (int i = 0; i <assinatura.length; i++) {
+							assinatura[i] = data.read();
+						}	
+					}
+					temp[0] = assinatura[contador];
+					contador++;
+					numero = deByteArrayParaIntArray(temp,1);
+					buffer[7] = numero[0];
+					number = numerosDeIndices(buffer,8);
+					
+					
+					//atualizando buffer
+					for (int i = 0; i < buffer.length-1; i++) {
+						buffer[i] = number[i+1];
+					}
+					
+					//agora, converto esse int para caractere
+					
+					
+					carac = (char) number[0];
+					
+					int[] freq = new int[4];
+					
+					for (int i = 0; i < 4; i++) {
+						freq[i] = assinatura[contador];
+						contador++;
+					}
+					//freq é um array com 4 posições
+					int[] freq2 = new int[4*8];
+					freq2 = deByteArrayParaIntArray(freq, 4);
+					
+					int[] var = new int[32];
+					int i = 0;
+					for (; i < 7; i++) {
+						var[i] = buffer[i];
+					}
+					
+					//os is que sobrarem serão preenchidos pelo que ficou em freq
+					
+					for (int j = 0; j < 25; j++) {
+						var[i] = freq2[j];
+					}
+					
+					//atualizando buffer
+					for (i = 25; i < 32; i++) {
+						buffer[i] = freq[i+1];
+					}
+					
+					int[] numeroDaFrequencia = numerosDeIndices(freq2,32);
+					//No noh = new No(carac,numeroDaFrequencia[0]);
+					lista.insere(new No(carac+"",numeroDaFrequencia[0]));
+					nLidos++;
+				}
+					
+					//lista criada :P
+					
+				
+				No raiz = No.constroiArvore(lista);
+				
+				//lê o arquivo do começo, pulando os primeiros 8 bytes
+				//no nono byte, despreza o 1º bit e faz um buffer
+					
+					
+					
+					//number[0] é o número
+					
+					
+					
+					
+					
+				
+				
+				
+				
 				
 				
 				
@@ -131,20 +227,7 @@ public class Decoder {
 				int[] temporario = new int[8]; 
 				
 				
-				//later
-				/*while(frequenciasLidas != cabecalho[1]){
-					if(bytesLidos == 1024){
-						data.read(assinatura);
-						bytesLidos = 0;
-					}
-					*/
-					//assinatura[bytesLidos+1]
-					           //TODO continuar a partir daqui
-					
-					
-					
-					
-				//}
+				
 				
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -196,7 +279,7 @@ public class Decoder {
 		/*o método seguinte irá converter o byte para um array de inteiros representando os índices para compor o número maior.  
 		 * ... eu acho
 		 */
-	public static int[] deByteArrayParaIntArray(byte[] bytes, int nBytes){
+	public static int[] deByteArrayParaIntArray(int[] bytes, int nBytes){
 		//passando esse array, se eu fizer uma modificação,
 		//quando o método acabar, a modificação continua feita?
 		
@@ -211,7 +294,6 @@ public class Decoder {
 			boolean ehNegativo = valor<0? true: false; 
 			valor = Math.abs(valor);
 				for(int j = 1; j<=8; j++){
-					 //convertendo de byte para int implicitamente
 					temporario[8-j] = valor%2;		
 					valor = valor/2;
 				}
@@ -228,9 +310,7 @@ public class Decoder {
 						System.out.print(temporario[j]);
 					}
 					
-					
-					
-						for (int j = 0; j < temporario.length; j++) {
+					for (int j = 0; j < temporario.length; j++) {
 							if(temporario[j]== 1)temporario[j] = 0;
 							else temporario[j] = 1;
 						}
@@ -272,8 +352,8 @@ public class Decoder {
 	 */
 	
 	//esse a é só para não usar 32... vou pensar em um nome melhor para esse argumento.
-	public static long[] numerosDeIndices(int[] indices, int a){
-		long[] numeros = new long[indices.length/a];
+	public static int[] numerosDeIndices(int[] indices, int a){
+		int[] numeros = new int[indices.length/a];
 		
 		for (int i = 0; i < numeros.length; i++) {
 			
