@@ -202,48 +202,56 @@ public class Decoder {
 		
 		int[] indices = new int[1024*8]; 
 		int[] temporario = {-1,-1,-1,-1,-1,-1,-1,-1};
-		boolean ehNegativo = false;
-		
+			
 		for(int i = 0; i<nBytes; i++){ //de byte em byte
 			
 			int valor = (int) bytes[i];
 			System.out.println("valor: " +valor);
-			if(valor<0){
-				ehNegativo = true;				
-				valor = Math.abs(valor);
-				System.out.println("valor absoluto: " +valor);
-			}
+			
+			boolean ehNegativo = valor<0? true: false; 
+			valor = Math.abs(valor);
 				for(int j = 1; j<=8; j++){
 					 //convertendo de byte para int implicitamente
 					temporario[8-j] = valor%2;		
 					valor = valor/2;
 				}
 			
-				if(!ehNegativo || (valor==0)){
+				if(!ehNegativo){
 					for(int j = 0; j< 8; j++){
 						indices[j+(8*i)] = temporario[j];
 					}
 				}
 				else{
+					
+					System.out.println("temporario1:");
+					for (int j = 0; j < temporario.length; j++) {
+						System.out.print(temporario[j]);
+					}
+					
+					
+					
 						for (int j = 0; j < temporario.length; j++) {
 							if(temporario[j]== 1)temporario[j] = 0;
 							else temporario[j] = 1;
 						}
 						
-						System.out.println("temporario1:");
+						System.out.println("temporario2:");
 						for (int j = 0; j < temporario.length; j++) {
 							System.out.print(temporario[j]);
 						}
 						System.out.println("\n");
-						int j = 7;
-						while(temporario[j] == 1 && j>0){
+						int j = 8;
+						while(j>0 && temporario[j-1] == 1 ){
+							j--;
 							temporario[j]=0;
-							j--;						
-					}
-						temporario[j]++;				
+													
+							}
+						j--;
+						temporario[j] = 1;
+						//temporario[j]++;				
 			}
 				
-			System.out.println("temporario2:");
+			System.out.println("temporario3:");
 			for (int j = 0; j < temporario.length; j++) {
 				System.out.print(temporario[j]);
 			}
