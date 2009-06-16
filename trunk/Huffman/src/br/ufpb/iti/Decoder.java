@@ -88,15 +88,13 @@ public class Decoder {
 				BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 				DataInputStream data = new DataInputStream(buffReader);  
 		
-				
-				
-				//se funciona, você não questiona =P
 				byte[] assinatura = new byte[1024];  
-				int[] indices = new int[8*1024];
 				int[] teste = new int[8*9];
 				
+				for (int i = 0; i <assinatura.length; i++) {
+					assinatura[i] = data.readByte();
+				}
 				
-				data.read(assinatura);
 				for (int i = 0; i < assinatura.length; i++) {
 					System.out.print(assinatura[i]+" ");
 					
@@ -115,6 +113,9 @@ public class Decoder {
 				
 				for (int i = 0; i < primeiros.length; i++) {
 					primeiros[i] = teste[i+1];
+					System.out.print(primeiros[i]);
+					if((i+1)%32 == 0)
+						System.out.println();
 				}
 				
 				long[] cabecalho = numerosDeIndices(primeiros, 32);
@@ -129,12 +130,14 @@ public class Decoder {
 				int bytesLidos = 9;
 				int[] temporario = new int[8]; 
 				
-				while(frequenciasLidas != cabecalho[1]){
+				
+				//later
+				/*while(frequenciasLidas != cabecalho[1]){
 					if(bytesLidos == 1024){
 						data.read(assinatura);
 						bytesLidos = 0;
 					}
-					
+					*/
 					//assinatura[bytesLidos+1]
 					           //TODO continuar a partir daqui
 					
@@ -197,26 +200,47 @@ public class Decoder {
 		
 		int[] indices = new int[1024*8]; 
 		int[] temporario = {-1,-1,-1,-1,-1,-1,-1,-1};
+		boolean ehNegativo = false;
 		
 		for(int i = 0; i<nBytes; i++){ //de byte em byte
-			int valor = (int) bytes[i]; 
+			
+			int valor = (int) bytes[i];
 			System.out.println("valor: " +valor);
-			if(valor>=0){
+			if(valor<0){
+				ehNegativo = true;				
+				valor = Math.abs(valor);
+			}
 				for(int j = 1; j<=8; j++){
 					 //convertendo de byte para int implicitamente
 					temporario[8-j] = valor%2;		
 					valor = valor/2;
 				}
-			}
-			else{
-				temporario[0] = 1;
-				valor = Math.abs(valor);
-				for (int j = 0; j < 7; j++) {
-					temporario[7-j] = valor%2;		
-					valor = valor/2;
+			
+				if(!ehNegativo){
+					for(int j = 0; j< 8; j++){
+						indices[j+(8*i)] = temporario[j];
+					}
 				}
+				else{
+						for (int j = 0; j < temporario.length; j++) {
+							if(temporario[j]== 1)temporario[j] = 0;
+							else temporario[j] = 1;
+						}
+						
+						System.out.println("temporario1:");
+						for (int j = 0; j < temporario.length; j++) {
+							System.out.print(temporario[j]);
+						}
+						System.out.println("\n");
+						int j = 7;
+						while(temporario[j] == 1 && j>0){
+							temporario[j]=0;
+							j--;						
+					}
+						temporario[j]++;				
 			}
-			System.out.println("temporario:");
+				
+			System.out.println("temporario2:");
 			for (int j = 0; j < temporario.length; j++) {
 				System.out.print(temporario[j]);
 			}
@@ -242,8 +266,8 @@ public class Decoder {
 		
 		for (int i = 0; i < numeros.length; i++) {
 			
-			for(int j =1; j<=a; j++){
-				numeros[i] +=  ((int) Math.pow(2.0, a-j)) * indices[(i*a) + j-1];
+			for(int j =31; j>=0; j--){
+				numeros[i] +=  ((int) Math.pow(2.0,j)) * indices[(i*a) + 31-j];
 			}
 			
 		}

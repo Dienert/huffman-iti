@@ -1,11 +1,14 @@
 package br.ufpb.iti;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
@@ -176,9 +179,14 @@ public class Huffman {
 				absolutePathResult = "/tmp/teste.adh";
 			}
 
-			FileWriter fWriter = new FileWriter(absolutePathResult);
+			/*FileWriter fWriter = new FileWriter(absolutePathResult);
 			BufferedWriter out = new BufferedWriter(fWriter);
-
+*/
+			
+			FileOutputStream fWriter = new FileOutputStream(absolutePathResult);
+			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
+			DataOutputStream out = new DataOutputStream(buffWriter);
+			
 			byte[] assinatura = new byte[1024];  
 			int nBytes;
 
@@ -234,8 +242,12 @@ public class Huffman {
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 			DataInputStream dataIn = new DataInputStream(buffReader);  
 			
-			FileWriter fWriter = new FileWriter(absolutePath+".tmp");
-			BufferedWriter out = new BufferedWriter(fWriter);
+			/*FileWriter fWriter = new FileWriter(absolutePath+".tmp");
+			BufferedWriter out = new BufferedWriter(fWriter);*/
+			
+			FileOutputStream fWriter = new FileOutputStream(absolutePath+".tmp");
+			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
+			DataOutputStream out = new DataOutputStream(buffWriter);
 			
 			buffer = "";
 			
@@ -315,7 +327,7 @@ public class Huffman {
 	 * @param isLastByte
 	 * @return Array de Strings que contém o novo buffer a ser atualizado
 	 */
-	public static String save(String code, String buffer, BufferedWriter out, boolean isLastByte) {
+	public static String save(String code, String buffer, DataOutputStream out, boolean isLastByte) {
 
 		int bufferSize = buffer.length();
 		int codeSize = code.length();
