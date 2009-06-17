@@ -215,27 +215,6 @@ public class Huffman {
 		}
 	}
 	
-//	public static String getCode(No no) {
-//		No aux = no;
-//		String codigo = "";
-//		while(aux.getPai() != null) {
-//			if (aux.getEhEsq())
-//				codigo = codigo+"0";
-//			else
-//				codigo = codigo+"1";
-//			aux = aux.getPai();
-//		}
-//		return invertCode(codigo);
-//	}
-//	
-//	public static String invertCode(String code) {
-//		char[] codeChars = code.toCharArray();
-//		char[] newCode = code.toCharArray();
-//		for (int i = 0, j = codeChars.length-1; i < codeChars.length; i++, j--)
-//			newCode[j] = codeChars[i];
-//		return new String(newCode);
-//	}
-	
 	public static void putHeader(int[] counters, Hashtable<String, Integer>hashFreq, String absolutePath) {
 		try {
 			FileInputStream fReader = new FileInputStream(absolutePath);
@@ -258,11 +237,14 @@ public class Huffman {
 			//O primeiro bit eh relativo ao número de bytes usados para cada símbolo
 			//Se forem 8 bits => 1º bit = 0
 			//Se forem 16 bits => 1º bit = 1
-			String parteFixa = type.equals(ONE_BYTE)?"0":"1"+ // 1º bit
-					  		   getFormatedCode(messageSize, 32)+ // Nº de símbolos da msg
-					  		   getFormatedCode(usedSimbolsNumber, 32); // Nº de símbolos diferentes da msg
+			String parteFixa = 
+				(getFormatedCode(messageSize, 32)+ // Nº de símbolos da msg
+				getFormatedCode(usedSimbolsNumber, 32)+ // Nº de símb diferentes da msg
+				(type.equals(ONE_BYTE)?"00001000":"00010000"));
 			
 			buffer = save(parteFixa, buffer, out, false);
+			
+			System.out.println("parte fixa do header: "+parteFixa);
 			
 			Enumeration<String> enumeration = hashFreq.keys();
 			
@@ -352,11 +334,11 @@ public class Huffman {
 				buffer = buffer+code;
 				if (buffer.length() == 8) {
 //					System.out.print(buffer+"|");
-					out.write(getByte(buffer));
+					out.writeByte(getByte(buffer));
 					buffer = "";
 				} else if (buffer.length() < 8 && isLastByte) {
 //					System.out.println("\nUltimo codigo salvo: "+buffer);
-					out.write(getByte(buffer));
+					out.writeByte(getByte(buffer));
 					buffer = "";
 				}
 			}
@@ -386,8 +368,8 @@ public class Huffman {
 	/**
 	 * 
 	 * Retorna um String relativa ao código binário de um inteiro
-	 * @param inteiro Número decimal a ser convertido em binário representado como
-	 * String
+	 * @param inteiro Número decimal a ser convertido em binário representado 
+	 * como String
 	 * @return A String que representa o binário
 	 * 
 	 */
@@ -400,8 +382,8 @@ public class Huffman {
 	
 	/**
 	 * 
-	 * Converte um inteiro para binário em forma de String com um número exato de
-	 * bits, completando com zero os bits que não forem usados.
+	 * Converte um inteiro para binário em forma de String com um número exato 
+	 * de bits, completando com zero os bits que não forem usados.
 	 * @param inteiro Número a ser convertido para binário
 	 * @param nBits Número de bits que a String deve ter
 	 * @return String formatada de acordo com o número de bits especificados
@@ -420,12 +402,13 @@ public class Huffman {
 	
 	/**
 	 * 
-	 * Divide uma String em duas partes, a primeira contendo o número de caracteres
-	 * especificado por size e a segunda contendo o restante da String inicial
+	 * Divide uma String em duas partes, a primeira contendo o número de 
+	 * caracteres especificado por size e a segunda contendo o restante 
+	 * da String inicial
 	 * @param code String que será dividida
 	 * @param size Tamanho que a primeira parte da String vai ter
-	 * @return Um array de String com duas Strings, no índice 0 a primeira parte
-	 * e no índice 1, a segunda parte
+	 * @return Um array de String com duas Strings, no índice 0 a primeira 
+	 * parte e no índice 1, a segunda parte
 	 * 
 	 */
 	public static String[] divideCode(String code, int size) {
@@ -447,7 +430,8 @@ public class Huffman {
 		No aux = lista.getFirst();
 		float entropia = 0.0f;
 		for(; aux!=null; aux = aux.getDir()){
-			entropia += ((aux.getFreq()/(float)lidos) * (Math.log(1/(float)aux.getFreq())));
+			entropia += ((aux.getFreq()/(float)lidos) * 
+						(Math.log(1/(float)aux.getFreq())));
 		}
 		return -entropia;
 	}
