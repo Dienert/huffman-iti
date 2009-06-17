@@ -143,9 +143,10 @@ public class Decoder {
 			int nSimbolosDecodificados = 0;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				int i = 0;
+				int bitIndex = 0;
+
 				while (nSimbolosDecodificados < caracteresTotais && i < nBytes) {
 					
-					int bitIndex = 0;
 					String simbolo = "";
 					while (!aux.ehFolha() && bitIndex < 8) {
 						char bit = Huffman.getFormatedCode(assinatura[i], 8)
@@ -165,8 +166,10 @@ public class Decoder {
 						}
 						aux = raiz;
 						nSimbolosDecodificados ++;
+					} else {
+						i++;
+						bitIndex = 0;
 					}
-					else i++;
 				}
 			}
 		} catch (IOException e) {
