@@ -401,15 +401,11 @@ public class Huffman {
 	 * 
 	 */
 	public static String getFormatedCode(int inteiro, int nBits) {
-		
-		String result = Integer.toBinaryString(inteiro);
-		if (inteiro < 0) {
+		String result = "";
+		result = Integer.toBinaryString(inteiro);
+		if (inteiro <0) {
+			result = inverteBits(subtraiUm(result));
 			result = result.substring(24, 31);
-			int actualSize = result.length();
-			if (nBits != actualSize) {
-				for (int i=0; i<(nBits-actualSize);i++)
-					result = result+"0";
-			}			
 		} else {
 			int actualSize = result.length();
 			if (nBits != actualSize) {
@@ -474,4 +470,23 @@ public class Huffman {
 		return out;
 	}
 	
+	public static String inverteBits(String code) {
+		String result = "";
+		for (int i=0; i<code.length(); i++) {
+			result = result+(code.charAt(i)=='0'? "1" : "0");
+		}
+		return result;
+	}
+	
+	public static String subtraiUm(String code) {
+		int j = 32;
+		char[] result = code.toCharArray();
+		while(j>0 && result[j-1] == '0' ){
+			j--;
+			result[j]=1;
+		}
+		j--;
+		result[j] = '0';
+		return String.valueOf(result);
+	}
 }

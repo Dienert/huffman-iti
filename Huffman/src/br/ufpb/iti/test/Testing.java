@@ -103,4 +103,24 @@ public class Testing {
 		}
 	}
 	
+	@Test
+	public void getFormatedCode(){
+		Huffman.getFormatedCode(-140, 8);
+	}
+	
+	@Test
+	public void inverteBits(){
+		String result = Huffman.inverteBits("01010101");
+		assertEquals("10101010", result);
+	}
+	
+	@Test
+	public void removeUm(){
+		String result = Huffman.subtraiUm("01010101");
+		assertEquals("01010100", result);
+	}
+	
+	
+	
+	
 }
