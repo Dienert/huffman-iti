@@ -149,8 +149,8 @@ public class Decoder {
 					
 					String simbolo = "";
 					while (!aux.ehFolha() && bitIndex < 8) {
-						char bit = Huffman.getFormatedCode(assinatura[i], 8)
-										.charAt(bitIndex);
+						char bit = Huffman.getFormatedCode(assinatura[i], 8).
+										charAt(bitIndex);
 						if (bit == '0')
 							aux = aux.getFilhoEsq();
 						else
