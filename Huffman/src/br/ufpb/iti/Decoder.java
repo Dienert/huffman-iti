@@ -13,7 +13,13 @@ public class Decoder {
 	
 	private static String absolutePath = "";
 	private static String absolutePathResult = "";
-	private static String buffer = "";
+	private static byte[] assinatura = new byte[1024];	
+	
+	private static int caracteresTotais = 0;
+	
+	private static int simbolosDiferentes = 0;
+	
+	private static byte simbolosTamanho;
 	
 	/**
 	 * 
@@ -50,11 +56,11 @@ public class Decoder {
 		BufferedInputStream buffReader = new BufferedInputStream(fReader);  
 		DataInputStream data = new DataInputStream(buffReader);  
 
-		int caracteresTotais = data.readInt();
+		caracteresTotais = data.readInt();
 		
-		int simbolosDiferentes = data.readInt();
+		simbolosDiferentes = data.readInt();
 		
-		byte simbolosTamanho = data.readByte();
+		simbolosTamanho = data.readByte();
 			
 		System.out.println("Total de símbolos: "+caracteresTotais);
 		System.out.println("Símbolos diferentes: "+simbolosDiferentes);
@@ -85,6 +91,12 @@ public class Decoder {
 		
 		No raiz = No.constroiArvore(lista);
 		
+		System.out.println("\n");
+		
+		No.percorreInOrdem(raiz);
+		
+		System.out.println("\n");
+		
 		if (!absolutePath.equals("")) {
 			int lastIndx = absolutePath.lastIndexOf(".");
 			if (lastIndx == -1) {
@@ -97,8 +109,8 @@ public class Decoder {
 					absolutePathResult = absolutePathResult+".decodificado";
 				} else {
 					String nome = absolutePathResult.substring(0, lastIndx);
-					String ext = absolutePathResult.substring(lastIndx+1, 
-												absolutePathResult.length()-1);
+					String ext = absolutePathResult.substring(lastIndx, 
+												absolutePathResult.length());
 					absolutePathResult = nome+".decodificado"+ext;
 				}
 			}
@@ -108,25 +120,8 @@ public class Decoder {
 		BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
 		DataOutputStream out = new DataOutputStream(buffWriter);
 		
-		byte[] assinatura = new byte[1024];  
-		int nBytes;
+		decode(data, out, raiz);
 		
-		while((nBytes = data.read(assinatura)) != -1) {
-			if(simbolosTamanho == 8) {
-				for (int i=0; i<nBytes; i++) {
-					String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
-					boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
-					buffer = save(code, buffer, out, isLastByte); //Atualizando o buffer
-				}
-			} else {
-				for (int i=0; i<nBytes; i+=2) {
-					String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
-							(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
-					boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
-					buffer = save(code, buffer, out, isLastByte); //Atualizando o buffer
-				}
-			}
-		}
 		out.close();
 		
 		
@@ -139,7 +134,46 @@ public class Decoder {
 		}
 	}
 	
-	
+	public static void decode(DataInputStream dataIn, DataOutputStream dataOut, No raiz) {
+		
+		int nBytes;
+		
+		try {
+			No aux = raiz;
+			int nSimbolosDecodificados = 0;
+			while((nBytes = dataIn.read(assinatura)) != -1) {
+				int i = 0;
+				while (nSimbolosDecodificados < caracteresTotais && i < nBytes) {
+					
+					int bitIndex = 0;
+					String simbolo = "";
+					while (!aux.ehFolha() && bitIndex < 8) {
+						char bit = Huffman.getFormatedCode(assinatura[i], 8)
+										.charAt(bitIndex);
+						if (bit == '0')
+							aux = aux.getFilhoEsq();
+						else
+							aux = aux.getFilhoDir();
+						bitIndex++;
+						
+					}
+					if (aux.ehFolha()) {
+						simbolo = aux.getCaracter();
+						dataOut.writeByte(simbolo.charAt(0));
+						if (simbolosDiferentes == 8 && simbolo.length() == 2) {
+							dataOut.writeByte(simbolo.charAt(1));
+						}
+						aux = raiz;
+						nSimbolosDecodificados ++;
+					}
+					else i++;
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("Falha de leitura do arquivo");
+			System.exit(1);
+		}
+	}
 	
 }
 

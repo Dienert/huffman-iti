@@ -105,6 +105,12 @@ public class Huffman {
 			
 			No raiz = No.constroiArvore(lista);
 			
+			System.out.println("\n");
+			
+			No.percorreInOrdem(raiz);
+			
+			System.out.println("\n");
+			
 			//Gera um hash de simbolos e seus codigos
 			updateHashSimbolsAndCodes(raiz, "");
 			
@@ -174,7 +180,7 @@ public class Huffman {
 				int lastIndx = absolutePath.lastIndexOf(".");
 				if (lastIndx == -1)
 					absolutePathResult = absolutePath+".adh";
-				else absolutePathResult = absolutePath.substring(0, lastIndx+1)+"adh";
+				else absolutePathResult = absolutePath+".adh";
 			} else {
 				absolutePathResult = "/tmp/teste.adh";
 			}

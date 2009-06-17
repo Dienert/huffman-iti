@@ -91,6 +91,10 @@ public class No {
 		this.filhoDir = filhoDir;
 	}
 
+	public boolean ehFolha() {
+		return (this.filhoDir == null && this.filhoEsq == null);
+	}
+	
 	public static void mostraArvore(No raiz){
 		
 		if(raiz == null){
@@ -136,5 +140,18 @@ public class No {
 		}
 		return lista.getFirst();
 	}
-
+	
+	/**
+	 * 
+	 * Percorre inordem uma árvore
+	 * 
+	 */
+	public static void percorreInOrdem(No no) {
+		if (no != null) {
+			percorreInOrdem(no.getFilhoEsq());
+			if (no.caracter != null)
+				System.out.print(no.caracter);
+			percorreInOrdem(no.getFilhoDir());
+		}
+	}
 }
