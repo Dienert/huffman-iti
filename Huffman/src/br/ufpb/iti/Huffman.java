@@ -289,9 +289,13 @@ public class Huffman {
 			int nBytes;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				for (int i=0; i<nBytes; i++) {
-					out.write(assinatura[i]);
+					buffer = save(getFormatedCode(assinatura[i], 8),
+							      buffer, out, false);
 				}
 			}			
+			if (buffer.length() < 8)
+				buffer = save(buffer, "", out, true);
+			
 			out.close();
 			
 			File fileIn = new File(absolutePath);
@@ -397,12 +401,22 @@ public class Huffman {
 	 * 
 	 */
 	public static String getFormatedCode(int inteiro, int nBits) {
-		String result = getCode(inteiro);
-		int actualSize = result.length();
-		if (nBits != actualSize) {
-			for (int i=0; i<(nBits-actualSize);i++)
-				result = "0"+result;
-		}			
+		
+		String result = Integer.toBinaryString(inteiro);
+		if (inteiro < 0) {
+			result = result.substring(24, 31);
+			int actualSize = result.length();
+			if (nBits != actualSize) {
+				for (int i=0; i<(nBits-actualSize);i++)
+					result = result+"0";
+			}			
+		} else {
+			int actualSize = result.length();
+			if (nBits != actualSize) {
+				for (int i=0; i<(nBits-actualSize);i++)
+					result = "0"+result;
+			}			
+		}
 		return result;
 	}
 	
