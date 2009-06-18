@@ -289,7 +289,9 @@ public class Huffman {
 			int nBytes;
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				for (int i=0; i<nBytes; i++) {
-					buffer = save(getFormatedCode(assinatura[i], 8),
+					//transformando um signed byte em um unsigned byte
+					int num = 16 * ((assinatura[i] & 0xf0) >> 4) + (assinatura[i] & 0x0f);
+					buffer = save(getFormatedCode(num, 8),
 							      buffer, out, false);
 				}
 			}			

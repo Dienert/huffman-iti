@@ -149,7 +149,9 @@ public class Decoder {
 					
 					String simbolo = "";
 					while (!aux.ehFolha() && bitIndex < 8) {
-						char bit = Huffman.getFormatedCode(assinatura[i], 8).
+						//transformando um signed byte em um unsigned byte
+						int num = 16 * ((assinatura[i] & 0xf0) >> 4) + (assinatura[i] & 0x0f);
+						char bit = Huffman.getFormatedCode(num, 8).
 										charAt(bitIndex);
 						if (bit == '0')
 							aux = aux.getFilhoEsq();
