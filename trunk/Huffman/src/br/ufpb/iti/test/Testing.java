@@ -4,14 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 
 import org.junit.Test;
 
@@ -19,18 +15,6 @@ import br.ufpb.iti.Huffman;
 
 public class Testing {
 
-	public static String currentTime() {
-		long time = System.currentTimeMillis();
-		Calendar.getInstance().setTimeInMillis(time);
-		int hour = Calendar.getInstance().get(Calendar.HOUR);
-		int minute = Calendar.getInstance().get(Calendar.MINUTE);
-		int second = Calendar.getInstance().get(Calendar.SECOND);
-		int mili = Calendar.getInstance().get(Calendar.MILLISECOND);
-		String out = hour+":"+minute+":"+second+"."+mili;
-		System.out.println("Time: "+out);
-		return out;
-	}
-	
 	@Test
 	public void divideCode() {
 		String code = "00010101";
@@ -103,20 +87,5 @@ public class Testing {
 	public void getFormatedCode(){
 		Huffman.getFormatedCode(-140, 8);
 	}
-	
-	@Test
-	public void inverteBits(){
-		String result = Huffman.inverteBits("01010101");
-		assertEquals("10101010", result);
-	}
-	
-	@Test
-	public void removeUm(){
-		String result = Huffman.subtraiUm("01010101");
-		assertEquals("01010100", result);
-	}
-	
-	
-	
 	
 }
