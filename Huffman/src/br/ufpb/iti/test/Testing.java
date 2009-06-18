@@ -73,18 +73,9 @@ public class Testing {
 	@Test
 	public void testeGravaELe() {
 		try {
-			String absolutePath = "/home/dienert/Desktop/teste.txt";
-			
-			FileOutputStream fWriter;
-			fWriter = new FileOutputStream(absolutePath);
-			BufferedOutputStream buffWriter = new BufferedOutputStream(fWriter);  
-			DataOutputStream out = new DataOutputStream(buffWriter);
+			String absolutePath = "/media/Documentos/workspace/linux/mopa/Huffman/bin/files/alice29.adh";
 			
 			int number = 8;
-			
-			out.write(Huffman.getByte(Huffman.getCode(number)));
-			
-			out.close();
 			
 			FileInputStream fReader = new FileInputStream(absolutePath);
 			BufferedInputStream buffReader = new BufferedInputStream(fReader);  
@@ -101,6 +92,11 @@ public class Testing {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void getByte() {
+		Huffman.getByte("01010010");
 	}
 	
 	@Test

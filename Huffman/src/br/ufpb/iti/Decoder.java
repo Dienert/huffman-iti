@@ -27,7 +27,8 @@ public class Decoder {
 	 * 
 	 */
 	public static void printSyntax() {
-		System.out.println("Usage: java HuffmanDecoder file.adh ");
+		System.out.println("Linux Usage: ./decoder.jar file.adh ");
+		System.out.println("Windows Usage: decoder.jar file.adh ");
 				
 		System.exit(1);
 	}
@@ -35,7 +36,6 @@ public class Decoder {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("aqui");
 		int size = args.length;
 		String fileName = "";
 				

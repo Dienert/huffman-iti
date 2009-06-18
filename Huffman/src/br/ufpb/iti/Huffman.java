@@ -36,7 +36,8 @@ public class Huffman {
 	 * 
 	 */
 	public static void printSyntax() {
-		System.out.println("Usage: java Huffman file [options]");
+		System.out.println("Linux Usage: ./encoder.jar file [options]");
+		System.out.println("Windows Usage: encoder.jar file [options]");
 		System.out.println("\nwhere options are:");
 		System.out.println("\n-1b		read caracters as 1 byte:");
 		System.out.println("\n-2b		read caracters as 2 bytes:");
