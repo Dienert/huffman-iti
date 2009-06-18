@@ -39,6 +39,8 @@ public class Decoder {
 		int size = args.length;
 		String fileName = "";
 				
+		long inicio = System.currentTimeMillis();
+		
 		if (size >= 1){
 			fileName = args[0];
 		}
@@ -71,7 +73,7 @@ public class Decoder {
 		if (simbolosTamanho == 8) {
 			for (int i=0; i<simbolosDiferentes; i++) {
 				No novo = new No();
-				char simbol = (char)data.readByte();
+				char simbol = (char)(data.readByte() & 0xFF);
 				int freq = data.readInt();
 				novo.setCaracter(simbol+"");
 				novo.setFreq(freq);
@@ -80,10 +82,10 @@ public class Decoder {
 		} else {
 			for (int i=0; i<simbolosDiferentes; i++) {
 				No novo = new No();
-				char simbol1 = (char)data.readByte();
-				char simbol2 = (char)data.readByte();
+				char simbol1 = (char)(data.readByte() & 0xFF);
+				char simbol2 = (char)(data.readByte() & 0xFF);
 				int freq = data.readInt();
-				novo.setCaracter(simbol1+simbol2+"");
+				novo.setCaracter(""+simbol1+""+simbol2);
 				novo.setFreq(freq);
 				lista.insere(novo);
 			}
@@ -124,6 +126,11 @@ public class Decoder {
 		
 		out.close();
 		
+		long fim = System.currentTimeMillis();
+		
+		float diff = (fim - inicio)/(float)1000;
+		
+		System.out.println("Duração de decodificação: "+diff+" segundos");		
 		
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado");
@@ -163,7 +170,7 @@ public class Decoder {
 					if (aux.ehFolha()) {
 						simbolo = aux.getCaracter();
 						dataOut.writeByte(simbolo.charAt(0));
-						if (simbolosDiferentes == 8 && simbolo.length() == 2) {
+						if (simbolosTamanho == 16 && simbolo.length() == 2) {
 							dataOut.writeByte(simbolo.charAt(1));
 						}
 						aux = raiz;

@@ -2,15 +2,15 @@ package br.ufpb.iti;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -49,7 +49,7 @@ public class Huffman {
 		int sizeParams = args.length;
 		String fileName = "";
 		
-		currentTime();
+		long inicio = currentTime();
 		if (sizeParams >= 1)
 			fileName = args[0];
 		if(sizeParams == 2)
@@ -74,15 +74,15 @@ public class Huffman {
 					for (int i=0; i<nBytes; i++) {
 						//Esta linha converte um byte para char e depois para String
 						//e insere o caracter na hash de frenquencias
-						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)));
+						updateHashTableFreq(""+(char)(assinatura[i] & 0xFF));
 						lidos++;
 					}
 				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
 						//Esta linha converte dois bytes para 2 chars e depois para String
 						//e insere o caracter na hashtable de frenquencias
-						updateHashTableFreq(new String(""+(char)(assinatura[i] & 0xFF)+
-								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF)))); 
+						updateHashTableFreq(""+(char)(assinatura[i] & 0xFF)+
+								(i+1 == nBytes? "" : ""+(char)(assinatura[i+1] & 0xFF))); 
 						//para que danado serve esse 0xFF ... ele significa true... então é par
 						//caso a linha i+1 seja igual ao numero de bytes lidos, entao
 						//o segundo caracter nao existe, e serah inserido apenas 1 caracter na hashtable
@@ -98,9 +98,9 @@ public class Huffman {
 			//Constroi a lista ordenada da HashTable
 			counters = lista.constroiLista(hashFrequencia); 
 			
-			System.out.println("Numero de símbolos da mensagem: "+counters[0]);
+			System.out.println("Total de símbolos: "+counters[0]);
 			
-			System.out.println("Numero de símbolos diferentes da mensagem: "+counters[1]);
+			System.out.println("Símbolos diferentes: "+counters[1]);
 			
 			System.out.println("Entropia: "+calculaEntropia(lista, counters[0]));
 			
@@ -121,9 +121,32 @@ public class Huffman {
 			//Inicia codificacao da mensagem
 			codification();
 			
+			File withouHeader = new File(absolutePathResult);
+			
+			long noHeader = withouHeader.length();
+			
+			System.out.println("Arquivo sem cabeçalho: "+getSizeView(noHeader));
+			
 			putHeader(counters, hashFrequencia, absolutePathResult);
 			
-			currentTime();
+			long fim = currentTime();
+			
+			float diff = (fim - inicio)/(float)1000;
+			
+			System.out.println("Duração de codificação: "+diff+" segundos");
+			
+			File in = new File(absolutePath);
+			File out = new File(absolutePathResult);
+			
+			long initial = in.length();
+			long ended = out.length();
+			
+			System.out.println("Arquivo original: "+getSizeView(initial));
+			System.out.println("Arquivo com cabeçalho: "+getSizeView(ended));
+			
+			float taxa = ended/(float)initial*100;
+			NumberFormat formater = new DecimalFormat("#.##");
+			System.out.println("Taxa de compressão: "+formater.format(taxa)+"%");
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado");
@@ -200,14 +223,14 @@ public class Huffman {
 			while((nBytes = dataIn.read(assinatura)) != -1) {
 				if(type.equals(ONE_BYTE)) {
 					for (int i=0; i<nBytes; i++) {
-						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)));
+						String code = hashCodes.get(""+(char)(assinatura[i] & 0xFF));
 						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
 						buffer = save(code, buffer, out, isLastByte); //Atualizando o buffer
 					}
 				} else if (type.equals(TWO_BYTES)) {
 					for (int i=0; i<nBytes; i+=2) {
-						String code = hashCodes.get(new String(""+(char)(assinatura[i] & 0xFF)+
-								(i+1 == nBytes? "" : (char)(assinatura[i+1] & 0xFF))));
+						String code = hashCodes.get(""+(char)(assinatura[i] & 0xFF)+
+								(i+1 == nBytes? "" : ""+(char)(assinatura[i+1] & 0xFF)));
 						boolean isLastByte = ((i+1) == nBytes) && (nBytes != 1024);
 						buffer = save(code, buffer, out, isLastByte); //Atualizando o buffer
 					}
@@ -245,13 +268,13 @@ public class Huffman {
 			//Se forem 8 bits => 1º bit = 0
 			//Se forem 16 bits => 1º bit = 1
 			String parteFixa = 
-				(getFormatedCode(messageSize, 32)+ // Nº de símbolos da msg
-				getFormatedCode(usedSimbolsNumber, 32)+ // Nº de símb diferentes da msg
-				(type.equals(ONE_BYTE)?"00001000":"00010000"));
+				 (getFormatedCode(messageSize, 32)+ // Nº de símbolos da msg
+				 getFormatedCode(usedSimbolsNumber, 32))+ // Nº de símb diferentes da msg
+				 (type.equals(ONE_BYTE)?"00001000":"00010000"); 
 			
 			buffer = save(parteFixa, buffer, out, false);
 			
-			System.out.println("parte fixa do header: "+parteFixa);
+//			System.out.println("parte fixa do header: "+parteFixa);
 			
 			Enumeration<String> enumeration = hashFreq.keys();
 			
@@ -464,7 +487,7 @@ public class Huffman {
 	 * @return Tempo corrente em String
 	 * 
 	 */
-	public static String currentTime() {
+	public static long currentTime() {
 		long time = System.currentTimeMillis();
 		Calendar.getInstance().setTimeInMillis(time);
 		int hour = Calendar.getInstance().get(Calendar.HOUR);
@@ -472,8 +495,8 @@ public class Huffman {
 		int second = Calendar.getInstance().get(Calendar.SECOND);
 		int mili = Calendar.getInstance().get(Calendar.MILLISECOND);
 		String out = hour+":"+minute+":"+second+"."+mili;
-		System.out.println("Time: "+out);
-		return out;
+		System.out.println("Hora: "+out);
+		return time;
 	}
 	
 	public static String inverteBits(String code) {
@@ -494,5 +517,29 @@ public class Huffman {
 		j--;
 		result[j] = '0';
 		return String.valueOf(result);
+	}
+	
+	/**
+	 * Metodo que converte um tamanho em kylobytes para a unidade mais adequada
+	 * @param size
+	 * @return String contendo o tamanho convertido incluindo a unidade
+	 */
+	public static String getSizeView(long size) {
+		String result = "";
+		NumberFormat formater = new DecimalFormat("#.##");
+		Double valor = new Double(""+size);
+		if (size < 1024) {
+			result = formater.format(valor)+" Bytes";
+		} else if (size >= 1024 && size < 1048576) {
+			valor = valor/1024;
+			result = formater.format(valor)+" KB";
+		} else if (size >= 1048576 && size < 1073741824) {
+			valor = valor/1048576;
+			result = formater.format(valor)+" MB";
+		} else if (size >= 1073741824 && size < 1610612736) {
+			valor = valor/1073741824;
+			result = formater.format(valor)+" GB";
+		}
+		return result; 
 	}
 }
