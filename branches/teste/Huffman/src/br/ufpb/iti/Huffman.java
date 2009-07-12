@@ -34,6 +34,7 @@ public class Huffman {
 	 * 
 	 * Imprime a sintaxe correta de uso do programa
 	 * 
+	 * 
 	 */
 	public static void printSyntax() {
 		System.out.println("Linux Usage: ./encoder.jar file [options]");
