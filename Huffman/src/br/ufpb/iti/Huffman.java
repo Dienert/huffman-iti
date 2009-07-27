@@ -17,6 +17,7 @@ import java.util.Hashtable;
 
 /**
  * Classe codificadora do arquivo. Muito legal.
+ * Agora sim, esse negócio funciona!!!
  * @author root
  *
  */
