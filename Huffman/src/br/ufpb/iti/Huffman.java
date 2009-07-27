@@ -15,6 +15,12 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+/**
+ * Classe codificadora do arquivo. Muito legal.
+ * Agora sim, esse negócio funciona!!!
+ * @author root
+ *
+ */
 public class Huffman {
 
 	private static Hashtable<String, Integer> hashFrequencia = new Hashtable<String, Integer>();
