@@ -1,0 +1,1 @@
+Codificador que utiliza o algoritmo de Huffman
